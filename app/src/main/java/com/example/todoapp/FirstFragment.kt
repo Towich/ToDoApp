@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.databinding.FragmentFirstBinding
 
 /**
@@ -14,6 +16,7 @@ import com.example.todoapp.databinding.FragmentFirstBinding
 class FirstFragment : Fragment() {
 
     private var _binding: FragmentFirstBinding? = null
+    private var repository: MainRepository = MainRepository()
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -31,6 +34,10 @@ class FirstFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val recyclerView: RecyclerView = binding.recyclerView
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        recyclerView.adapter = repository.getWorks().value?.let { CustomRecyclerAdapter(it) }
     }
 
     override fun onDestroyView() {

@@ -2,7 +2,7 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.ToDoApp" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
-        <item name="colorPrimary">@color/black_16</item>
+        <item name="colorPrimary">@color/white</item>
         <item name="background">@color/black_16</item>
         <item name="floatingActionButtonStyle">@style/FloatingActionButtonStyle</item>
     </style>
