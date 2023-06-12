@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_importance_no"
+        android:title="Нет" />
+    <item
+        android:id="@+id/menu_importance_low"
+        android:title="Низкий" />
+    <item
+        android:id="@+id/menu_importance_high"
+        android:title="!!Высокий"
+        app:actionViewClass="androidx.appcompat.widget.AppCompatTextView">
+    </item>
+</menu>

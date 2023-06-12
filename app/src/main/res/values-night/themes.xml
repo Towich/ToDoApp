@@ -1,9 +1,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.ToDoApp" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.ToDoApp" parent="Theme.AppCompat.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
-        <item name="colorPrimary">@color/white</item>
         <item name="background">@color/black_16</item>
+        <item name="colorSecondary">@color/black_16</item>
+        <item name="colorPrimaryDark">@color/black_16</item>
         <item name="floatingActionButtonStyle">@style/FloatingActionButtonStyle</item>
     </style>
     
@@ -16,4 +17,10 @@
         <item name="cornerFamily">rounded</item>
         <item name="backgroundTint">@color/blue</item>
     </style>
+
+
+<!--    <style name="checkBoxStyle" parent="Theme.AppCompat.DayNight">-->
+<!--        <item name="colorAccent">@color/green</item>-->
+<!--        <item name="android:textColorSecondary">@color/gray_26</item>-->
+<!--    </style>-->
 </resources>

@@ -3,7 +3,7 @@
     
     <dimen name="large_title">38sp</dimen>
     <dimen name="title">20sp</dimen>
-    <dimen name="button">14dp</dimen>
-    <dimen name="body">16dp</dimen>
-    <dimen name="subhead">14dp</dimen>
+    <dimen name="button">14sp</dimen>
+    <dimen name="body">16sp</dimen>
+    <dimen name="subhead">14sp</dimen>
 </resources>
