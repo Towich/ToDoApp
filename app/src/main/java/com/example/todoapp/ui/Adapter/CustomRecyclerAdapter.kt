@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import android.widget.CompoundButton
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -15,6 +16,8 @@ import com.example.todoapp.data.model.TodoItem
 
 class CustomRecyclerAdapter(private val works: List<TodoItem>) :
     RecyclerView.Adapter<CustomRecyclerAdapter.MyViewHolder>() {
+
+    private var onClickListener: OnClickListener? = null
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val checkBox: CheckBox = itemView.findViewById(R.id.checkbox)
@@ -32,32 +35,72 @@ class CustomRecyclerAdapter(private val works: List<TodoItem>) :
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        holder.checkBox.text = works[position].textCase
+
+        val todoItem: TodoItem = works[position]
+
+        holder.checkBox.text = todoItem.textCase
+        holder.checkBox.isChecked = todoItem.completed
+
+        val importance: Boolean = todoItem.importance == "Высокий"
+
+        updateStatusOfWork(holder.checkBox, todoItem.completed, importance)
+
         holder.checkBox.setOnCheckedChangeListener { compoundButton, isChecked ->
             run {
-                if (isChecked) {
-                    compoundButton.paintFlags =
-                        compoundButton.paintFlags.or(Paint.STRIKE_THRU_TEXT_FLAG)
 
-                    compoundButton.setTextColor(
-                        ContextCompat.getColor(
-                            holder.checkBox.context,
-                            R.color.gray_33
-                        )
-                    )
-                } else {
-                    compoundButton.paintFlags =
-                        compoundButton.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                updateStatusOfWork(compoundButton, isChecked, importance)
 
-                    compoundButton.setTextColor(
-                        ContextCompat.getColor(
-                            holder.checkBox.context,
-                            R.color.white
-                        )
-                    )
-                }
+                todoItem.completed = isChecked
             }
-            Toast.makeText(compoundButton.context, "currentId: " + works[position].id, Toast.LENGTH_SHORT).show()
+//            Toast.makeText(compoundButton.context, "currentId: " + works[position].id, Toast.LENGTH_SHORT).show()
+        }
+
+        holder.buttonInfo.setOnClickListener {
+            if (onClickListener != null) {
+                onClickListener!!.onClick(todoItem)
+            }
         }
     }
+    private fun updateStatusOfWork(compoundButton: CompoundButton, newStatus: Boolean, isHighImportance: Boolean){
+        if(newStatus){
+            compoundButton.paintFlags =
+                compoundButton.paintFlags.or(Paint.STRIKE_THRU_TEXT_FLAG)
+
+            compoundButton.setTextColor(
+                ContextCompat.getColor(
+                    compoundButton.context,
+                    R.color.gray_33
+                )
+            )
+
+            compoundButton.setButtonDrawable(R.drawable.checked)
+        }
+        else {
+            compoundButton.paintFlags =
+                compoundButton.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+
+            compoundButton.setTextColor(
+                ContextCompat.getColor(
+                    compoundButton.context,
+                    R.color.white
+                )
+            )
+
+            if(isHighImportance)
+                compoundButton.setButtonDrawable(R.drawable.unchecked__1_)
+            else
+                compoundButton.setButtonDrawable(R.drawable.unchecked)
+        }
+    }
+
+    // A function to bind the onclickListener.
+    fun setOnClickListener(onClickListener: OnClickListener) {
+        this.onClickListener = onClickListener
+    }
+
+    // onClickListener Interface
+    interface OnClickListener {
+        fun onClick(model: TodoItem)
+    }
+
 }

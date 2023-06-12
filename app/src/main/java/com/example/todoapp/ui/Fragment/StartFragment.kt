@@ -11,6 +11,7 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.R
+import com.example.todoapp.data.model.TodoItem
 import com.example.todoapp.ui.Adapter.CustomRecyclerAdapter
 import com.example.todoapp.ui.Repository.StartRepository
 import com.example.todoapp.databinding.FragmentStartBinding
@@ -43,10 +44,22 @@ class StartFragment : Fragment() {
 
         val recyclerView: RecyclerView = binding.recyclerView
         recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = viewModel.getWorks().value?.let { CustomRecyclerAdapter(it) }
+
+        var mAdapter = viewModel.getWorks().value?.let { CustomRecyclerAdapter(it) }
+
+        mAdapter?.setOnClickListener(object: CustomRecyclerAdapter.OnClickListener {
+            override fun onClick(model: TodoItem) {
+                viewModel.setCurrModel(model)
+                viewModel.setCurrEditing(true)
+                view.findNavController().navigate(R.id.EditWorkFragment)
+            }
+        })
+        recyclerView.adapter = mAdapter
+
 
         binding.fab.setOnClickListener {
             view.findNavController().navigate(R.id.EditWorkFragment)
+            viewModel.setCurrEditing(false)
         }
 
         viewModel.getWorks().observe(viewLifecycleOwner, Observer { it?.let {

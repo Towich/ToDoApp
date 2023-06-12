@@ -9,10 +9,17 @@ class StartRepository {
     private var currentId: String = "0"
 
     init {
-        works.value = ArrayList<TodoItem>()
-        addWork(TodoItem("НАДО ЧТО-ТО КУПИТЬ!!", "срочная"))
-        addWork(TodoItem("ТОЧНО НАДО ЧТО-ТО КУПИТЬ", "обычная"))
-        addWork(TodoItem( "надо что-то реально купить..", "низкая"))
+        works.value = ArrayList()
+        addWork(TodoItem("НАДО ЧТО-ТО КУПИТЬ!!", "Высокий"))
+        addWork(TodoItem("ТОЧНО НАДО ЧТО-ТО КУПИТЬ", "Высокий"))
+        addWork(TodoItem( "три", "низкая"))
+        addWork(TodoItem( "четары.", "Высокий"))
+        addWork(TodoItem( "петь", "Высокий"))
+        addWork(TodoItem( "шышсть", "низкая"))
+        addWork(TodoItem( "севен", "низкая"))
+        addWork(TodoItem( "уосемь", "Высокий"))
+        addWork(TodoItem( "деват", "низкая"))
+        addWork(TodoItem( "десат", "Высокий"))
     }
 
 

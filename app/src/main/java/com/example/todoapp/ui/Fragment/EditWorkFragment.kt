@@ -47,7 +47,7 @@ class EditWorkFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.imagebuttonClose.setOnClickListener {
-            requireActivity().supportFragmentManager.popBackStack();
+            requireActivity().supportFragmentManager.popBackStack()
         }
 
         val buttonShowImportancePopupMenu = binding.textImportanceTitle
@@ -56,10 +56,9 @@ class EditWorkFragment : Fragment() {
             showImportancePopupMenu(buttonShowImportancePopupMenu)
         }
 
-        binding.buttonSave.setOnClickListener {
-            startViewModel.addWork(TodoItem("newWork", "СРОЧНО"))
-            requireActivity().supportFragmentManager.popBackStack();
-        }
+
+        connectSaveModel()
+        loadEditingModel()
     }
 
     private fun showImportancePopupMenu(v: View){
@@ -78,27 +77,78 @@ class EditWorkFragment : Fragment() {
 
         popupMenu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { menuItem: MenuItem? ->
 
-            when(menuItem!!.itemId){
-                R.id.menu_importance_no -> {
-                    Toast.makeText(context, "menu_importance_no", Toast.LENGTH_SHORT).show()
-                }
-                R.id.menu_importance_low -> {
-                    Toast.makeText(context, "menu_importance_low", Toast.LENGTH_SHORT).show()
-                }
-                R.id.menu_importance_high -> {
-                    Toast.makeText(context, "menu_importance_high", Toast.LENGTH_SHORT).show()
-                }
-            }
+//            when(menuItem!!.itemId){
+//                R.id.menu_importance_no -> {
+//                    Toast.makeText(context, "menu_importance_no", Toast.LENGTH_SHORT).show()
+//                }
+//                R.id.menu_importance_low -> {
+//                    Toast.makeText(context, "menu_importance_low", Toast.LENGTH_SHORT).show()
+//                }
+//                R.id.menu_importance_high -> {
+//                    Toast.makeText(context, "menu_importance_high", Toast.LENGTH_SHORT).show()
+//                }
+//            }
 
-            binding.textImportanceBody.text = menuItem.title
+            binding.textImportanceBody.text = menuItem?.title
+
+            if(menuItem!!.itemId == R.id.menu_importance_high)
+                binding.textImportanceBody.setTextColor(ContextCompat.getColor(v.context, R.color.red))
+            else
+                binding.textImportanceBody.setTextColor(ContextCompat.getColor(v.context, R.color.gray_66))
             true
         })
 
         popupMenu.show()
     }
 
+    private fun loadEditingModel(){
+        val todoItem = startViewModel.getCurrModel() ?: return
+
+        binding.editText.setText(todoItem?.textCase)
+
+        var importStr = todoItem?.importance
+        if(importStr == "Высокий") {
+            importStr = "!!$importStr"
+            binding.textImportanceBody.setTextColor(
+                ContextCompat.getColor(
+                    binding.editText.context,
+                    R.color.red
+                )
+            )
+        }
+
+        binding.textImportanceBody.text = importStr
+
+    }
+
+    private fun connectSaveModel(){
+        binding.buttonSave.setOnClickListener {
+
+            var importance = binding.textImportanceBody.text.toString()
+
+            if(importance.equals("!!Высокий"))
+                importance = importance.drop(2)
+
+            // edit existing work
+            if(startViewModel.isCurrEditing() == true){
+                startViewModel.getCurrModel()?.textCase = binding.editText.text.toString()
+                startViewModel.getCurrModel()?.importance = importance
+            }
+            else{ // create a new work
+                val newWork = TodoItem(binding.editText.text.toString(), importance)
+                Toast.makeText(context, newWork.toString(), Toast.LENGTH_SHORT).show()
+                startViewModel.addWork(newWork)
+            }
+
+            requireActivity().supportFragmentManager.popBackStack();
+
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
+        startViewModel.clearCurrModel()
+        startViewModel.clearCurrEditing()
         _binding = null
     }
 }
