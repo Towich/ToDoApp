@@ -61,6 +61,7 @@ class EditWorkFragment : Fragment() {
         loadEditingModel()
     }
 
+    // Show Popup menu with choosing importance
     private fun showImportancePopupMenu(v: View){
         val popupMenu = PopupMenu(context, v)
         popupMenu.menuInflater.inflate(R.menu.menu_importance, popupMenu.menu)

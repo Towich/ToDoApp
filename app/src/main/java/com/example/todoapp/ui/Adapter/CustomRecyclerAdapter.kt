@@ -45,15 +45,16 @@ class CustomRecyclerAdapter(private val works: List<TodoItem>) :
 
         updateStatusOfWork(holder.checkBox, todoItem.completed, importance)
 
-        holder.checkBox.setOnCheckedChangeListener { compoundButton, isChecked ->
+        holder.checkBox.setOnClickListener {
             run {
 
-                updateStatusOfWork(compoundButton, isChecked, importance)
+                updateStatusOfWork(holder.checkBox, !todoItem.completed, importance)
 
-                todoItem.completed = isChecked
+                todoItem.completed = !todoItem.completed
             }
-//            Toast.makeText(compoundButton.context, "currentId: " + works[position].id, Toast.LENGTH_SHORT).show()
         }
+
+//            Toast.makeText(compoundButton.context, "currentId: " + works[position].id, Toast.LENGTH_SHORT).show()
 
         holder.buttonInfo.setOnClickListener {
             if (onClickListener != null) {
