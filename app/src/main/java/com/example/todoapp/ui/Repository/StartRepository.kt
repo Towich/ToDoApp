@@ -27,9 +27,19 @@ class StartRepository {
         return works
     }
 
+    fun getWorkById(id: String): TodoItem? {
+        return works.value?.find { it.id == id }
+    }
     fun addWork(work: TodoItem){
         work.id = currentId
         currentId = (currentId.toInt() + 1).toString()
         works.value = works.value?.plus(work)
+    }
+
+    fun removeWork(todoItem: TodoItem){
+        works.value = works.value?.minus(todoItem)
+    }
+    fun removeWorkById(id: String){
+        works.value?.minus(getWorkById(id))
     }
 }

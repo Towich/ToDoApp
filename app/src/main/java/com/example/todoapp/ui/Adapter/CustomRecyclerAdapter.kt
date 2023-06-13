@@ -45,28 +45,33 @@ class CustomRecyclerAdapter(private val works: List<TodoItem>) :
 
         updateStatusOfWork(holder.checkBox, todoItem.completed, importance)
 
+        // Click on CheckBox
         holder.checkBox.setOnClickListener {
             run {
-
                 updateStatusOfWork(holder.checkBox, !todoItem.completed, importance)
-
                 todoItem.completed = !todoItem.completed
             }
         }
 
-//            Toast.makeText(compoundButton.context, "currentId: " + works[position].id, Toast.LENGTH_SHORT).show()
-
+        // Click on "Button Info"
         holder.buttonInfo.setOnClickListener {
             if (onClickListener != null) {
                 onClickListener!!.onClick(todoItem)
             }
         }
     }
+
+    // Changing CheckBox by clicking on it
     private fun updateStatusOfWork(compoundButton: CompoundButton, newStatus: Boolean, isHighImportance: Boolean){
+
+        // If CHECKED
         if(newStatus){
+
+            // Set "STRIKE_THRU" for CheckBox's Text
             compoundButton.paintFlags =
                 compoundButton.paintFlags.or(Paint.STRIKE_THRU_TEXT_FLAG)
 
+            // Set GRAY color for CheckBox's Text
             compoundButton.setTextColor(
                 ContextCompat.getColor(
                     compoundButton.context,
@@ -75,11 +80,14 @@ class CustomRecyclerAdapter(private val works: List<TodoItem>) :
             )
 
             compoundButton.setButtonDrawable(R.drawable.checked)
-        }
+        } // If NOT CHECKED
         else {
+
+            // Remove "STRIKE_THRU" from CheckBox's Text
             compoundButton.paintFlags =
                 compoundButton.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
 
+            // Set WHITE color for CheckBox's Text
             compoundButton.setTextColor(
                 ContextCompat.getColor(
                     compoundButton.context,
@@ -87,10 +95,11 @@ class CustomRecyclerAdapter(private val works: List<TodoItem>) :
                 )
             )
 
+            // If TodoItem has "Высокий" importance
             if(isHighImportance)
-                compoundButton.setButtonDrawable(R.drawable.unchecked__1_)
+                compoundButton.setButtonDrawable(R.drawable.unchecked__1_)  // red square
             else
-                compoundButton.setButtonDrawable(R.drawable.unchecked)
+                compoundButton.setButtonDrawable(R.drawable.unchecked)      // gray square
         }
     }
 

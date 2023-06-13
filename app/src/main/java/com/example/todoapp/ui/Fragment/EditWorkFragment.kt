@@ -1,6 +1,6 @@
 package com.example.todoapp.ui.Fragment
 
-import android.graphics.Color
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -11,11 +11,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
-import androidx.core.view.get
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
 import com.example.todoapp.R
 import com.example.todoapp.data.model.TodoItem
 import com.example.todoapp.databinding.FragmentEditWorkBinding
@@ -57,7 +54,9 @@ class EditWorkFragment : Fragment() {
         }
 
 
-        connectSaveModel()
+
+        connectButtonSave()
+        connectButtonDelete()
         loadEditingModel()
     }
 
@@ -102,6 +101,7 @@ class EditWorkFragment : Fragment() {
         popupMenu.show()
     }
 
+    // Set text in EditText and chosen importance by current TodoItem
     private fun loadEditingModel(){
         val todoItem = startViewModel.getCurrModel() ?: return
 
@@ -122,7 +122,8 @@ class EditWorkFragment : Fragment() {
 
     }
 
-    private fun connectSaveModel(){
+    // Set onClickListener for button "СОХРАНИТЬ"
+    private fun connectButtonSave(){
         binding.buttonSave.setOnClickListener {
 
             var importance = binding.textImportanceBody.text.toString()
@@ -143,6 +144,31 @@ class EditWorkFragment : Fragment() {
 
             requireActivity().supportFragmentManager.popBackStack();
 
+        }
+    }
+
+    // Set onClickListener for button "Удалить"
+    private fun connectButtonDelete(){
+
+        // If we creating a new task
+        if(startViewModel.isCurrEditing() == false){
+
+            // Set Image's and Text's color to GRAY_26
+            binding.imageViewDeleteEditWork.setImageResource(R.drawable.delete_gray)
+            binding.buttonDeleteEditWork.setTextColor(
+                ContextCompat.getColor(
+                    binding.imageViewDeleteEditWork.context,
+                    R.color.gray_26
+                )
+            )
+
+            return // button will haven't onClickListener
+        }
+
+        // If we editing an existing task
+        binding.buttonDeleteEditWork.setOnClickListener {
+            startViewModel.getCurrModel()?.let { it1 -> startViewModel.removeWork(it1) }
+            requireActivity().supportFragmentManager.popBackStack()
         }
     }
 

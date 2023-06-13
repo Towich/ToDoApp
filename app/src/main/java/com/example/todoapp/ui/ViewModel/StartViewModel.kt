@@ -18,6 +18,12 @@ class StartViewModel: ViewModel() {
     fun addWork(work: TodoItem){
         repository.addWork(work)
     }
+    fun removeWork(todoItem: TodoItem){
+        repository.removeWork(todoItem)
+    }
+    fun removeWorkById(id: String){
+        repository.removeWorkById(id)
+    }
     fun getWorkById() = works // TODO
 
     // Current model
