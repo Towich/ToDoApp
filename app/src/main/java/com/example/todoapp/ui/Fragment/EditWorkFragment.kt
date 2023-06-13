@@ -13,6 +13,8 @@ import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.Navigation
+import androidx.navigation.findNavController
 import com.example.todoapp.R
 import com.example.todoapp.data.model.TodoItem
 import com.example.todoapp.databinding.FragmentEditWorkBinding
@@ -44,7 +46,7 @@ class EditWorkFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.imagebuttonClose.setOnClickListener {
-            requireActivity().supportFragmentManager.popBackStack()
+            mPopBackStack()
         }
 
         val buttonShowImportancePopupMenu = binding.textImportanceTitle
@@ -142,7 +144,7 @@ class EditWorkFragment : Fragment() {
                 startViewModel.addWork(newWork)
             }
 
-            requireActivity().supportFragmentManager.popBackStack();
+            mPopBackStack()
 
         }
     }
@@ -168,8 +170,12 @@ class EditWorkFragment : Fragment() {
         // If we editing an existing task
         binding.buttonDeleteEditWork.setOnClickListener {
             startViewModel.getCurrModel()?.let { it1 -> startViewModel.removeWork(it1) }
-            requireActivity().supportFragmentManager.popBackStack()
+            mPopBackStack()
         }
+    }
+
+    private fun mPopBackStack(){
+        view?.findNavController()?.navigateUp()
     }
 
     override fun onDestroyView() {

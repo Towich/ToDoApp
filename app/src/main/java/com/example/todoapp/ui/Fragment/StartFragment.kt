@@ -51,14 +51,14 @@ class StartFragment : Fragment() {
             override fun onClick(model: TodoItem) {
                 viewModel.setCurrModel(model)
                 viewModel.setCurrEditing(true)
-                view.findNavController().navigate(R.id.EditWorkFragment)
+                view.findNavController().navigate(R.id.action_StartFragment_to_EditWorkFragment)
             }
         })
         recyclerView.adapter = mAdapter
 
 
         binding.fab.setOnClickListener {
-            view.findNavController().navigate(R.id.EditWorkFragment)
+            view.findNavController().navigate(R.id.action_StartFragment_to_EditWorkFragment)
             viewModel.setCurrEditing(false)
         }
 

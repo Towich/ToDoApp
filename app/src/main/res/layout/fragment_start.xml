@@ -5,7 +5,6 @@
     style="@style/Base.Theme.ToDoApp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black_16"
     tools:context=".ui.Fragment.StartFragment">
 
     <TextView

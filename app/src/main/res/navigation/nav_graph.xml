@@ -12,7 +12,11 @@
         tools:layout="@layout/fragment_start">
         <action
             android:id="@+id/action_StartFragment_to_EditWorkFragment"
-            app:destination="@id/EditWorkFragment" />
+            app:destination="@id/EditWorkFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
     <fragment
         android:id="@+id/EditWorkFragment"
@@ -21,6 +25,10 @@
         tools:layout="@layout/fragment_edit_work">
         <action
             android:id="@+id/action_EditWorkFragment_to_StartFragment"
-            app:destination="@id/StartFragment" />
+            app:destination="@id/StartFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
 </navigation>
