@@ -25,6 +25,7 @@ class StartViewModel: ViewModel() {
         repository.removeWorkById(id)
     }
     fun getWorkById() = works // TODO
+    fun getWork(index: Int) = works.value?.get(index)
 
     // Current model
     fun setCurrModel(newModel: TodoItem){
