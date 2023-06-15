@@ -52,7 +52,8 @@ class StartFragment : Fragment() {
         recyclerView = binding.recyclerView
         recyclerView.layoutManager = LinearLayoutManager(context)
 
-        var mAdapter = viewModel.getWorks().value?.let { CustomRecyclerAdapter(it) }
+        val mAdapter = CustomRecyclerAdapter(viewModel.getWorks())
+        recyclerView.adapter = mAdapter
 
         mAdapter?.setOnClickListener(object: CustomRecyclerAdapter.OnClickListener {
             override fun onClick(model: TodoItem) {
@@ -61,8 +62,6 @@ class StartFragment : Fragment() {
                 view.findNavController().navigate(R.id.action_StartFragment_to_EditWorkFragment)
             }
         })
-        recyclerView.adapter = mAdapter
-
 
         binding.fab.setOnClickListener {
             view.findNavController().navigate(R.id.action_StartFragment_to_EditWorkFragment)
@@ -70,7 +69,7 @@ class StartFragment : Fragment() {
         }
 
         viewModel.getWorks().observe(viewLifecycleOwner, Observer { it?.let {
-            recyclerView.adapter?.notifyDataSetChanged()
+            mAdapter?.notifyDataSetChanged()
             Toast.makeText(context, "UPDATING RECYCLER_VIEW ADAPTER", Toast.LENGTH_SHORT).show()
         } })
 

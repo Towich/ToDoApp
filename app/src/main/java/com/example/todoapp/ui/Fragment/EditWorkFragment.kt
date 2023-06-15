@@ -55,8 +55,6 @@ class EditWorkFragment : Fragment() {
             showImportancePopupMenu(buttonShowImportancePopupMenu)
         }
 
-
-
         connectButtonSave()
         connectButtonDelete()
         loadEditingModel()

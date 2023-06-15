@@ -10,11 +10,12 @@ import android.widget.CompoundButton
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.R
 import com.example.todoapp.data.model.TodoItem
 
-class CustomRecyclerAdapter(private val works: List<TodoItem>) :
+class CustomRecyclerAdapter(private var works: MutableLiveData<List<TodoItem>>) :
     RecyclerView.Adapter<CustomRecyclerAdapter.MyViewHolder>() {
 
     private var onClickListener: OnClickListener? = null
@@ -31,12 +32,14 @@ class CustomRecyclerAdapter(private val works: List<TodoItem>) :
     }
 
     override fun getItemCount(): Int {
-        return works.size
+        if(works.value != null)
+            return works.value!!.size
+        return 0
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
 
-        val todoItem: TodoItem = works[position]
+        val todoItem: TodoItem = works.value?.get(position) ?: return
 
         holder.checkBox.text = todoItem.textCase
         holder.checkBox.isChecked = todoItem.completed
@@ -112,5 +115,7 @@ class CustomRecyclerAdapter(private val works: List<TodoItem>) :
     interface OnClickListener {
         fun onClick(model: TodoItem)
     }
+
+
 
 }
