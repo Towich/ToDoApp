@@ -127,8 +127,6 @@ class StartFragment : Fragment() {
         val touchHelper = ItemTouchHelper(swipeGesture)
 
         touchHelper.attachToRecyclerView(itemRecyclerView)
-
-        recyclerView.adapter?.notifyDataSetChanged()
     }
 
 

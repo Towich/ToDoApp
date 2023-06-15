@@ -21,9 +21,6 @@ class StartViewModel: ViewModel() {
     fun removeWork(todoItem: TodoItem){
         repository.removeWork(todoItem)
     }
-    fun removeWorkById(id: String){
-        repository.removeWorkById(id)
-    }
     fun getWorkById() = works // TODO
     fun getWork(index: Int) = works.value?.get(index)
 

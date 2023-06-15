@@ -9,8 +9,7 @@ class StartRepository {
     private var currentId: String = "0"
 
     init {
-        works.value = ArrayList()
-        addWork(TodoItem("НАДО ЧТО-ТО КУПИТЬ!!", "Высокий"))
+        works.value = mutableListOf(TodoItem("НАДО ЧТО-ТО КУПИТЬ!!", "Высокий"))
         addWork(TodoItem("ТОЧНО НАДО ЧТО-ТО КУПИТЬ", "Высокий"))
         addWork(TodoItem( "три", "низкая"))
         addWork(TodoItem( "четары.", "Высокий"))
@@ -31,15 +30,17 @@ class StartRepository {
         return works.value?.find { it.id == id }
     }
     fun addWork(work: TodoItem){
+        val newList = works.value!!.toMutableList()
+
         work.id = currentId
         currentId = (currentId.toInt() + 1).toString()
-        works.value = works.value?.plus(work)
+
+        newList.add(0, work)
+
+        works.value = newList
     }
 
     fun removeWork(todoItem: TodoItem){
         works.value = works.value?.minus(todoItem)
-    }
-    fun removeWorkById(id: String){
-        works.value?.minus(getWorkById(id))
     }
 }
