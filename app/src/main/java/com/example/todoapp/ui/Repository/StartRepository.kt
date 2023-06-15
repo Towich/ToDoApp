@@ -2,12 +2,14 @@ package com.example.todoapp.ui.Repository
 
 import androidx.lifecycle.MutableLiveData
 import com.example.todoapp.data.model.TodoItem
+import java.util.Calendar
 
 class StartRepository {
 
     private val works: MutableLiveData<List<TodoItem>> = MutableLiveData<List<TodoItem>>()
     private var currentId: String = "0"
 
+    val MONTHS = arrayOf("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря")
     init {
         works.value = mutableListOf(TodoItem("НАДО ЧТО-ТО КУПИТЬ!!", "Высокий"))
         addWork(TodoItem("ТОЧНО НАДО ЧТО-ТО КУПИТЬ", "Высокий"))
@@ -42,5 +44,14 @@ class StartRepository {
 
     fun removeWork(todoItem: TodoItem){
         works.value = works.value?.minus(todoItem)
+    }
+
+    fun getCurrentDate(): List<Int> {
+        val c = Calendar.getInstance()
+        val year = c.get(Calendar.YEAR)
+        val month = c.get(Calendar.MONTH)
+        val day = c.get(Calendar.DAY_OF_MONTH)
+
+        return listOf(year, month, day)
     }
 }

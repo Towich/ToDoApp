@@ -42,6 +42,15 @@ class StartViewModel: ViewModel() {
     fun clearCurrEditing(){
         isCurrEditing = null
     }
+    fun getMonthByIndex(index: Int): String{
+        return repository.MONTHS[index]
+    }
+    fun clearDeadline(){
+        currModel?.deadlineData = ""
+    }
 
+    fun getCurrentDate(): List<Int> {
+        return repository.getCurrentDate()
+    }
 
 }

@@ -1,5 +1,6 @@
 package com.example.todoapp.ui.Fragment
 
+import android.app.DatePickerDialog
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.text.SpannableString
@@ -17,8 +18,11 @@ import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import com.example.todoapp.R
 import com.example.todoapp.data.model.TodoItem
+import com.example.todoapp.data.source.StartDataSource
 import com.example.todoapp.databinding.FragmentEditWorkBinding
 import com.example.todoapp.ui.ViewModel.StartViewModel
+import java.util.Calendar
+import javax.xml.datatype.DatatypeConstants.MONTHS
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
@@ -53,6 +57,25 @@ class EditWorkFragment : Fragment() {
 
         binding.textImportanceTitle.setOnClickListener {
             showImportancePopupMenu(buttonShowImportancePopupMenu)
+        }
+
+        binding.buttonSetDeadline.isEnabled = false
+        binding.buttonSetDeadline.setOnClickListener {
+            showDateDialog()
+        }
+
+        binding.switcherDeadline.setOnClickListener {
+            if(binding.switcherDeadline.isChecked){
+                binding.buttonSetDeadline.isEnabled = true
+                Toast.makeText(context, "NOW ENABLED!", Toast.LENGTH_SHORT).show()
+                showDateDialog()
+            }
+            else{
+                binding.buttonSetDeadline.isEnabled = false
+                binding.textViewSelectedDeadline.text = ""
+                startViewModel.clearDeadline()
+                Toast.makeText(context, "NOW DISABLED!", Toast.LENGTH_SHORT).show()
+            }
         }
 
         connectButtonSave()
@@ -105,9 +128,11 @@ class EditWorkFragment : Fragment() {
     private fun loadEditingModel(){
         val todoItem = startViewModel.getCurrModel() ?: return
 
-        binding.editText.setText(todoItem?.textCase)
+        // Load Text of task
+        binding.editText.setText(todoItem.textCase)
 
-        var importStr = todoItem?.importance
+        // Load importance
+        var importStr = todoItem.importance
         if(importStr == "Высокий") {
             importStr = "!!$importStr"
             binding.textImportanceBody.setTextColor(
@@ -117,8 +142,14 @@ class EditWorkFragment : Fragment() {
                 )
             )
         }
-
         binding.textImportanceBody.text = importStr
+
+        // Load deadline
+        binding.textViewSelectedDeadline.text = todoItem.deadlineData
+
+        if(todoItem.deadlineData != ""){
+            binding.switcherDeadline.isChecked = true
+        }
 
     }
 
@@ -135,9 +166,10 @@ class EditWorkFragment : Fragment() {
             if(startViewModel.isCurrEditing() == true){
                 startViewModel.getCurrModel()?.textCase = binding.editText.text.toString()
                 startViewModel.getCurrModel()?.importance = importance
+                startViewModel.getCurrModel()?.deadlineData = binding.textViewSelectedDeadline.text.toString()
             }
             else{ // create a new work
-                val newWork = TodoItem(binding.editText.text.toString(), importance)
+                val newWork = TodoItem(binding.editText.text.toString(), importance, binding.textViewSelectedDeadline.text.toString())
                 Toast.makeText(context, newWork.toString(), Toast.LENGTH_SHORT).show()
                 startViewModel.addWork(newWork)
             }
@@ -174,6 +206,25 @@ class EditWorkFragment : Fragment() {
 
     private fun mPopBackStack(){
         view?.findNavController()?.navigateUp()
+    }
+
+    private fun showDateDialog(){
+
+        val currentDate = startViewModel.getCurrentDate()
+
+        val dpd = DatePickerDialog(
+            this@EditWorkFragment.requireContext(),
+            DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
+
+                // Selected Date
+                val deadLineString = "" + dayOfMonth + " " + startViewModel.getMonthByIndex(monthOfYear) + ", " + year
+
+                // Display Selected Date in textbox
+                binding.textViewSelectedDeadline.text = deadLineString
+
+        }, currentDate[0], currentDate[1], currentDate[2])
+
+        dpd.show()
     }
 
     override fun onDestroyView() {
