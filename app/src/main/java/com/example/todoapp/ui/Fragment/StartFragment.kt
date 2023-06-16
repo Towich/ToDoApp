@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
@@ -19,8 +18,6 @@ import com.example.todoapp.ui.Adapter.CustomRecyclerAdapter
 import com.example.todoapp.databinding.FragmentStartBinding
 import com.example.todoapp.ui.ViewModel.StartViewModel
 import com.example.todoapp.ui.gesture.SwipeGesture
-import com.google.android.material.snackbar.BaseTransientBottomBar
-import com.google.android.material.snackbar.Snackbar
 import java.lang.Exception
 
 /**
@@ -39,11 +36,10 @@ class StartFragment : Fragment() {
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         _binding = FragmentStartBinding.inflate(inflater, container, false)
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -52,10 +48,27 @@ class StartFragment : Fragment() {
         recyclerView = binding.recyclerView
         recyclerView.layoutManager = LinearLayoutManager(context)
 
-        val mAdapter = CustomRecyclerAdapter(viewModel.getWorks())
+        val mAdapter = CustomRecyclerAdapter(viewModel.getWorks(), viewModel.getCompletedTasks())
         recyclerView.adapter = mAdapter
 
-        mAdapter?.setOnClickListener(object: CustomRecyclerAdapter.OnClickListener {
+        updateCounterCompletedTasks()
+
+        // onClick CheckBox on todoItem
+        mAdapter.setOnClickListenerCheckBoxButton(object: CustomRecyclerAdapter.OnClickListener {
+            override fun onClick(model: TodoItem) {
+                if (model.completed) {
+                    viewModel.addCompletedTask(model)
+                }
+                else{
+                    viewModel.removeCompletedTask(model)
+                }
+
+                updateCounterCompletedTasks()
+            }
+        })
+
+        // onClick Button "Info" on todoItem
+        mAdapter.setOnClickListenerInfoButton(object: CustomRecyclerAdapter.OnClickListener {
             override fun onClick(model: TodoItem) {
                 viewModel.setCurrModel(model)
                 viewModel.setCurrEditing(true)
@@ -69,8 +82,7 @@ class StartFragment : Fragment() {
         }
 
         viewModel.getWorks().observe(viewLifecycleOwner, Observer { it?.let {
-            mAdapter?.notifyDataSetChanged()
-            Toast.makeText(context, "UPDATING RECYCLER_VIEW ADAPTER", Toast.LENGTH_SHORT).show()
+            mAdapter?.notifyDataSetChanged() // yeeaahhh I know that it should be optimized
         } })
 
         swipeToGesture(recyclerView)
@@ -91,29 +103,30 @@ class StartFragment : Fragment() {
                             val deleteItem = viewModel.getWork(position)
                             if (deleteItem != null) {
                                 viewModel.removeWork(deleteItem)
+                                updateCounterCompletedTasks()
                             }
 
-                            val snackBar = Snackbar.make(this@StartFragment.recyclerView, "Item deleted", Snackbar.LENGTH_SHORT)
-                                .addCallback(object :BaseTransientBottomBar.BaseCallback<Snackbar>(){
-                                    override fun onShown(transientBottomBar: Snackbar?) {
-                                        super.onShown(transientBottomBar)
-
-                                        transientBottomBar?.setAction("UNDO"){
-
-                                        }
-                                    }
-                                })
-                                .apply {
-                                    animationMode = Snackbar.ANIMATION_MODE_FADE
-                                }
-
-                            snackBar.setActionTextColor(
-                                ContextCompat.getColor(
-                                    this@StartFragment.requireContext(),
-                                    R.color.green
-                                )
-                            )
-                            snackBar.show()
+//                            val snackBar = Snackbar.make(this@StartFragment.recyclerView, "Item deleted", Snackbar.LENGTH_SHORT)
+//                                .addCallback(object :BaseTransientBottomBar.BaseCallback<Snackbar>(){
+//                                    override fun onShown(transientBottomBar: Snackbar?) {
+//                                        super.onShown(transientBottomBar)
+//
+//                                        transientBottomBar?.setAction("UNDO"){
+//
+//                                        }
+//                                    }
+//                                })
+//                                .apply {
+//                                    animationMode = Snackbar.ANIMATION_MODE_FADE
+//                                }
+//
+//                            snackBar.setActionTextColor(
+//                                ContextCompat.getColor(
+//                                    this@StartFragment.requireContext(),
+//                                    R.color.green
+//                                )
+//                            )
+//                            snackBar.show()
                         }
 
                     }
@@ -129,7 +142,10 @@ class StartFragment : Fragment() {
         touchHelper.attachToRecyclerView(itemRecyclerView)
     }
 
-
+    private fun updateCounterCompletedTasks(){
+        val completedTaskString = "Выполнено - " + viewModel.getSizeCompletedTasks()
+        binding.textViewCompletedTasks.text = completedTaskString
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

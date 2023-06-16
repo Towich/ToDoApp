@@ -7,6 +7,7 @@ import java.util.Calendar
 class StartRepository {
 
     private val works: MutableLiveData<List<TodoItem>> = MutableLiveData<List<TodoItem>>()
+    private val completedTasks: MutableLiveData<List<TodoItem>> = MutableLiveData<List<TodoItem>>()
     private var currentId: String = "0"
 
     val MONTHS = arrayOf("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря")
@@ -21,12 +22,20 @@ class StartRepository {
         addWork(TodoItem( "уосемь", "Высокий"))
         addWork(TodoItem( "деват", "низкая"))
         addWork(TodoItem( "десат", "Высокий"))
+
+        completedTasks.value = mutableListOf()
     }
 
 
     fun getWorks(): MutableLiveData<List<TodoItem>> {
         return works
     }
+
+    fun getCompletedTasks(): MutableLiveData<List<TodoItem>>{
+        return completedTasks
+    }
+
+    fun getSizeCompletedTasks(): Int = completedTasks.value!!.size
 
     fun getWorkById(id: String): TodoItem? {
         return works.value?.find { it.id == id }
@@ -40,6 +49,18 @@ class StartRepository {
         newList.add(0, work)
 
         works.value = newList
+    }
+
+    fun addCompletedTask(task: TodoItem){
+        val newList = completedTasks.value!!.toMutableList()
+
+        newList.add(0, task)
+
+        completedTasks.value = newList
+    }
+
+    fun removeCompletedTask(task: TodoItem){
+        completedTasks.value = completedTasks.value?.minus(task)
     }
 
     fun removeWork(todoItem: TodoItem){

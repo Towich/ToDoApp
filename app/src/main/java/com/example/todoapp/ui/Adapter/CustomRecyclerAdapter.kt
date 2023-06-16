@@ -1,24 +1,26 @@
 package com.example.todoapp.ui.Adapter
 
 import android.graphics.Paint
-import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.CompoundButton
 import android.widget.ImageButton
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.R
 import com.example.todoapp.data.model.TodoItem
 
-class CustomRecyclerAdapter(private var works: MutableLiveData<List<TodoItem>>) :
+class CustomRecyclerAdapter(
+    private var works: MutableLiveData<List<TodoItem>>,
+    private var completedTasks: MutableLiveData<List<TodoItem>>
+    ) :
     RecyclerView.Adapter<CustomRecyclerAdapter.MyViewHolder>() {
 
-    private var onClickListener: OnClickListener? = null
+    private var onClickListenerCheckBoxButton: OnClickListener? = null
+    private var onClickListenerInfoButton: OnClickListener? = null
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val checkBox: CheckBox = itemView.findViewById(R.id.checkbox)
@@ -53,13 +55,17 @@ class CustomRecyclerAdapter(private var works: MutableLiveData<List<TodoItem>>) 
             run {
                 updateStatusOfWork(holder.checkBox, !todoItem.completed, importance)
                 todoItem.completed = !todoItem.completed
+
+                if(onClickListenerCheckBoxButton != null){
+                    onClickListenerCheckBoxButton!!.onClick(todoItem)
+                }
             }
         }
 
         // Click on "Button Info"
         holder.buttonInfo.setOnClickListener {
-            if (onClickListener != null) {
-                onClickListener!!.onClick(todoItem)
+            if (onClickListenerInfoButton != null) {
+                onClickListenerInfoButton!!.onClick(todoItem)
             }
         }
     }
@@ -107,8 +113,12 @@ class CustomRecyclerAdapter(private var works: MutableLiveData<List<TodoItem>>) 
     }
 
     // A function to bind the onclickListener.
-    fun setOnClickListener(onClickListener: OnClickListener) {
-        this.onClickListener = onClickListener
+    fun setOnClickListenerInfoButton(onClickListener: OnClickListener) {
+        this.onClickListenerInfoButton = onClickListener
+    }
+
+    fun setOnClickListenerCheckBoxButton(onClickListener: OnClickListener) {
+        this.onClickListenerCheckBoxButton = onClickListener
     }
 
     // onClickListener Interface

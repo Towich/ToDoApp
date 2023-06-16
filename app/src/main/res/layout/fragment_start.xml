@@ -20,12 +20,12 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/text_view_completed_tasks"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="60dp"
         android:layout_marginTop="6dp"
-        android:text="Выполнено - 5"
+        android:text="Выполнено - %null%"
         android:textColor="@color/gray_66"
         android:textSize="@dimen/title"
         app:layout_constraintStart_toStartOf="parent"
