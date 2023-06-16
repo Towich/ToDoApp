@@ -9,7 +9,7 @@ class StartViewModel: ViewModel() {
 
     private val repository = StartRepository()
     private var works: MutableLiveData<List<TodoItem>> = repository.getWorks()
-    private var completedTasks: MutableLiveData<List<TodoItem>> = repository.getCompletedTasks()
+    private var uncompletedTasks: MutableLiveData<List<TodoItem>> = repository.getUncompletedTasks()
 
     private var currModel: TodoItem? = null
     private var isCurrEditing: Boolean? = null // Is current editing or creating a new work
@@ -17,22 +17,22 @@ class StartViewModel: ViewModel() {
     // Tasks
     fun getWorks() = works
 
-    fun getCompletedTasks() = completedTasks
+    fun getUncompletedTasks() = uncompletedTasks
     fun addWork(work: TodoItem){
         repository.addWork(work)
     }
-    fun addCompletedTask(task: TodoItem){
-        repository.addCompletedTask(task)
+    fun addUncompletedTask(task: TodoItem){
+        repository.addUncompletedTask(task)
     }
-    fun removeCompletedTask(task: TodoItem){
-        repository.removeCompletedTask(task)
+    fun removeUncompletedTask(task: TodoItem){
+        repository.removeUncompletedTask(task)
     }
     fun getSizeCompletedTasks(): Int = repository.getSizeCompletedTasks()
     fun removeWork(todoItem: TodoItem){
         repository.removeWork(todoItem)
 
-        if(todoItem.completed)
-            repository.removeCompletedTask(todoItem)
+        if(!todoItem.completed)
+            repository.removeUncompletedTask(todoItem)
     }
     fun getWork(index: Int) = works.value?.get(index)
 

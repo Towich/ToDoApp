@@ -7,12 +7,14 @@ import java.util.Calendar
 class StartRepository {
 
     private val works: MutableLiveData<List<TodoItem>> = MutableLiveData<List<TodoItem>>()
-    private val completedTasks: MutableLiveData<List<TodoItem>> = MutableLiveData<List<TodoItem>>()
+    private val uncompletedTasks: MutableLiveData<List<TodoItem>> = MutableLiveData<List<TodoItem>>()
     private var currentId: String = "0"
 
     val MONTHS = arrayOf("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря")
     init {
-        works.value = mutableListOf(TodoItem("НАДО ЧТО-ТО КУПИТЬ!!", "Высокий"))
+        works.value = mutableListOf()
+        uncompletedTasks.value = mutableListOf()
+        addWork(TodoItem("НАДО ЧТО-ТО КУПИТЬ!!", "Высокий"))
         addWork(TodoItem("ТОЧНО НАДО ЧТО-ТО КУПИТЬ", "Высокий"))
         addWork(TodoItem( "три", "низкая"))
         addWork(TodoItem( "четары.", "Высокий"))
@@ -22,8 +24,6 @@ class StartRepository {
         addWork(TodoItem( "уосемь", "Высокий"))
         addWork(TodoItem( "деват", "низкая"))
         addWork(TodoItem( "десат", "Высокий"))
-
-        completedTasks.value = mutableListOf()
     }
 
 
@@ -31,36 +31,37 @@ class StartRepository {
         return works
     }
 
-    fun getCompletedTasks(): MutableLiveData<List<TodoItem>>{
-        return completedTasks
+    fun getUncompletedTasks(): MutableLiveData<List<TodoItem>>{
+        return uncompletedTasks
     }
 
-    fun getSizeCompletedTasks(): Int = completedTasks.value!!.size
+    fun getSizeCompletedTasks(): Int = works.value!!.size - uncompletedTasks.value!!.size
 
     fun getWorkById(id: String): TodoItem? {
         return works.value?.find { it.id == id }
     }
     fun addWork(work: TodoItem){
         val newList = works.value!!.toMutableList()
+        val newListUncompleted = uncompletedTasks.value!!.toMutableList()
 
         work.id = currentId
         currentId = (currentId.toInt() + 1).toString()
 
         newList.add(0, work)
+        newListUncompleted.add(0, work)
 
         works.value = newList
+        uncompletedTasks.value = newListUncompleted
     }
 
-    fun addCompletedTask(task: TodoItem){
-        val newList = completedTasks.value!!.toMutableList()
-
-        newList.add(0, task)
-
-        completedTasks.value = newList
+    fun addUncompletedTask(task: TodoItem){
+        val newListUncompleted = uncompletedTasks.value!!.toMutableList()
+        newListUncompleted.add(0, task)
+        uncompletedTasks.value = newListUncompleted
     }
 
-    fun removeCompletedTask(task: TodoItem){
-        completedTasks.value = completedTasks.value?.minus(task)
+    fun removeUncompletedTask(task: TodoItem){
+        uncompletedTasks.value = uncompletedTasks.value?.minus(task)
     }
 
     fun removeWork(todoItem: TodoItem){

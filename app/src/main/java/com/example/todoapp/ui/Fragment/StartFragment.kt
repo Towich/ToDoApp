@@ -28,6 +28,7 @@ class StartFragment : Fragment() {
     private var _binding: FragmentStartBinding? = null
     private val viewModel: StartViewModel by activityViewModels()
     private lateinit var recyclerView: RecyclerView
+    private var showingUncompletedTasks: Boolean = false
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -48,22 +49,22 @@ class StartFragment : Fragment() {
         recyclerView = binding.recyclerView
         recyclerView.layoutManager = LinearLayoutManager(context)
 
-        val mAdapter = CustomRecyclerAdapter(viewModel.getWorks(), viewModel.getCompletedTasks())
+        val mAdapter = CustomRecyclerAdapter(viewModel.getWorks())
         recyclerView.adapter = mAdapter
 
-        updateCounterCompletedTasks()
+        updateCounterUncompletedTasks()
 
         // onClick CheckBox on todoItem
         mAdapter.setOnClickListenerCheckBoxButton(object: CustomRecyclerAdapter.OnClickListener {
             override fun onClick(model: TodoItem) {
                 if (model.completed) {
-                    viewModel.addCompletedTask(model)
+                    viewModel.removeUncompletedTask(model)
                 }
                 else{
-                    viewModel.removeCompletedTask(model)
+                    viewModel.addUncompletedTask(model)
                 }
 
-                updateCounterCompletedTasks()
+                updateCounterUncompletedTasks()
             }
         })
 
@@ -76,14 +77,35 @@ class StartFragment : Fragment() {
             }
         })
 
+        // onClick FAB
         binding.fab.setOnClickListener {
             view.findNavController().navigate(R.id.action_StartFragment_to_EditWorkFragment)
             viewModel.setCurrEditing(false)
         }
 
+        // onClick "Eye"
+        binding.imageButtonShowCompletedTasks.setOnClickListener {
+            showingUncompletedTasks = !showingUncompletedTasks
+
+            if(showingUncompletedTasks){
+                mAdapter.setTasks(viewModel.getUncompletedTasks())
+                binding.imageButtonShowCompletedTasks.setImageResource(R.drawable.visibility)
+            }
+            else{
+                mAdapter.setTasks(viewModel.getWorks())
+                binding.imageButtonShowCompletedTasks.setImageResource(R.drawable.visibility_off)
+            }
+
+            mAdapter?.notifyDataSetChanged()
+        }
+
         viewModel.getWorks().observe(viewLifecycleOwner, Observer { it?.let {
             mAdapter?.notifyDataSetChanged() // yeeaahhh I know that it should be optimized
         } })
+
+        viewModel.getUncompletedTasks().observe(viewLifecycleOwner, Observer {
+            mAdapter?.notifyDataSetChanged()
+        })
 
         swipeToGesture(recyclerView)
     }
@@ -103,7 +125,7 @@ class StartFragment : Fragment() {
                             val deleteItem = viewModel.getWork(position)
                             if (deleteItem != null) {
                                 viewModel.removeWork(deleteItem)
-                                updateCounterCompletedTasks()
+                                updateCounterUncompletedTasks()
                             }
 
 //                            val snackBar = Snackbar.make(this@StartFragment.recyclerView, "Item deleted", Snackbar.LENGTH_SHORT)
@@ -142,7 +164,7 @@ class StartFragment : Fragment() {
         touchHelper.attachToRecyclerView(itemRecyclerView)
     }
 
-    private fun updateCounterCompletedTasks(){
+    private fun updateCounterUncompletedTasks(){
         val completedTaskString = "Выполнено - " + viewModel.getSizeCompletedTasks()
         binding.textViewCompletedTasks.text = completedTaskString
     }

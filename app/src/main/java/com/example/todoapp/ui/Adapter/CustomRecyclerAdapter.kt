@@ -13,11 +13,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.R
 import com.example.todoapp.data.model.TodoItem
 
-class CustomRecyclerAdapter(
-    private var works: MutableLiveData<List<TodoItem>>,
-    private var completedTasks: MutableLiveData<List<TodoItem>>
-    ) :
-    RecyclerView.Adapter<CustomRecyclerAdapter.MyViewHolder>() {
+class CustomRecyclerAdapter(private var tasks: MutableLiveData<List<TodoItem>>)
+    : RecyclerView.Adapter<CustomRecyclerAdapter.MyViewHolder>() {
 
     private var onClickListenerCheckBoxButton: OnClickListener? = null
     private var onClickListenerInfoButton: OnClickListener? = null
@@ -34,14 +31,14 @@ class CustomRecyclerAdapter(
     }
 
     override fun getItemCount(): Int {
-        if(works.value != null)
-            return works.value!!.size
+        if(tasks.value != null)
+            return tasks.value!!.size
         return 0
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
 
-        val todoItem: TodoItem = works.value?.get(position) ?: return
+        val todoItem: TodoItem = tasks.value?.get(position) ?: return
 
         holder.checkBox.text = todoItem.textCase
         holder.checkBox.isChecked = todoItem.completed
@@ -119,6 +116,10 @@ class CustomRecyclerAdapter(
 
     fun setOnClickListenerCheckBoxButton(onClickListener: OnClickListener) {
         this.onClickListenerCheckBoxButton = onClickListener
+    }
+
+    fun setTasks(tasks: MutableLiveData<List<TodoItem>>){
+        this.tasks = tasks
     }
 
     // onClickListener Interface
