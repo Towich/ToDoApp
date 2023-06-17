@@ -21,7 +21,9 @@
             app:expandedTitleMarginBottom="60dp"
             app:expandedTitleMarginStart="60dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:title="Мои дела">
+            app:title="Мои дела"
+            app:collapsedTitleTextColor="@color/white"
+            app:expandedTitleTextColor="@color/white">
 
             <ImageButton
                 android:id="@+id/image_button_show_completed_tasks"

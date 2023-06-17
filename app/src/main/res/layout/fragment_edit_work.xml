@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,165 +7,206 @@
     android:background="@color/black_16"
     tools:context=".ui.Fragment.EditWorkFragment">
 
-    <ImageButton
-        android:id="@+id/imagebutton_close"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="21dp"
-        android:layout_marginTop="24dp"
-        android:background="#00000000"
-        android:src="@drawable/baseline_close_24"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/button_save"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
-        android:layout_marginEnd="18dp"
-        android:background="#00000000"
-        android:padding="0dp"
-        android:text="СОХРАНИТЬ"
-        android:textColor="@color/blue"
-        android:textSize="@dimen/title"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <EditText
-        android:id="@+id/edit_text"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="23dp"
-        android:layout_marginEnd="20dp"
-        android:background="@drawable/rounded_border"
-        android:backgroundTint="@color/black_25"
-        android:gravity="start"
-        android:hint="Что надо сделать..."
-        android:minHeight="150dp"
-        android:padding="16dp"
-        android:textColor="@color/white"
-        android:textColorHint="@color/gray_66"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_save" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <Button
-        android:id="@+id/text_importance_title"
-        android:layout_width="wrap_content"
-        android:layout_height="60dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="28dp"
-        android:layout_marginEnd="20dp"
-        android:background="#00000000"
-        android:gravity="start"
-        android:padding="0dp"
-        android:text="Важность"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="@dimen/title"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_text" />
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/black_16">
 
-    <TextView
-        android:id="@+id/text_importance_body"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="-30dp"
-        android:text="Нет"
-        android:textColor="@color/gray_66"
-        android:textSize="@dimen/body"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_importance_title" />
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/tool_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-    <View
-        android:id="@+id/view2"
+                <ImageButton
+                    android:id="@+id/imagebutton_close"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="21dp"
+                    android:layout_marginTop="24dp"
+                    android:background="#00000000"
+                    android:src="@drawable/baseline_close_24"/>
+
+                <Button
+                    android:id="@+id/button_save"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:layout_marginEnd="18dp"
+                    android:layout_marginBottom="18dp"
+                    android:background="#00000000"
+                    android:padding="0dp"
+                    android:layout_gravity="end"
+
+                    android:text="СОХРАНИТЬ"
+                    android:textColor="@color/blue"
+                    android:textSize="@dimen/title" />
+            </androidx.appcompat.widget.Toolbar>
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+
+
+
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="20dp"
-        android:background="@color/gray_33"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_importance_title" />
-
-    <Button
-        android:id="@+id/button_set_deadline"
-        android:layout_width="wrap_content"
-        android:layout_height="60dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="28dp"
-        android:background="#00000000"
-        android:gravity="start"
-        android:text="Сделать до"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="@dimen/title"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view2" />
-
-    <TextView
-        android:id="@+id/text_view_selected_deadline"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="-30dp"
-        android:text=""
-        android:textColor="@color/blue"
-        android:textSize="@dimen/body"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_set_deadline" />
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:layout_constraintTop_toBottomOf="@+id/tool_bar">
 
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/switcher_deadline"
-        android:layout_width="wrap_content"
-        android:scaleX="1.2"
-        android:scaleY="1.2"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="26dp"
-        android:layout_marginEnd="20dp"
-        app:thumbTint="@color/blue"
-        app:trackTint="@drawable/newtrack"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view2" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="20dp">
 
-    <View
-        android:id="@+id/view3"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="30dp"
-        android:background="@color/gray_33"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_view_selected_deadline" />
+            <EditText
+                android:id="@+id/edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/rounded_border"
+                android:backgroundTint="@color/black_25"
+                android:gravity="start"
+                android:hint="Что надо сделать..."
+                android:layout_marginTop="20dp"
+                android:minHeight="150dp"
+                android:padding="16dp"
+                android:textColor="@color/white"
+                android:textColorHint="@color/gray_66"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/image_view_delete_edit_work"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="23dp"
-        android:src="@drawable/delete"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view3" />
+            <Button
+                android:id="@+id/text_importance_title"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="28dp"
+                android:layout_marginEnd="20dp"
+                android:background="#00000000"
+                android:gravity="start"
+                android:padding="0dp"
+                android:text="Важность"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="@dimen/title"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edit_text" />
 
-    <Button
-        android:id="@+id/button_delete_edit_work"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginStart="14dp"
-        android:layout_marginTop="6dp"
-        android:background="#00000000"
-        android:text="Удалить"
-        android:textAllCaps="false"
-        android:textColor="@color/red"
-        android:textSize="@dimen/title"
-        app:layout_constraintStart_toEndOf="@+id/image_view_delete_edit_work"
-        app:layout_constraintTop_toBottomOf="@+id/view3" />
+            <TextView
+                android:id="@+id/text_importance_body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="-30dp"
+                android:text="Нет"
+                android:textColor="@color/gray_66"
+                android:textSize="@dimen/body"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_importance_title" />
 
+            <View
+                android:id="@+id/view2"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:background="@color/gray_33"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_importance_title" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <Button
+                android:id="@+id/button_set_deadline"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="28dp"
+                android:background="#00000000"
+                android:gravity="start"
+                android:text="Сделать до"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="@dimen/title"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/view2" />
+
+            <TextView
+                android:id="@+id/text_view_selected_deadline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="-30dp"
+                android:text=""
+                android:textColor="@color/blue"
+                android:textSize="@dimen/body"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/button_set_deadline" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switcher_deadline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="26dp"
+                android:layout_marginEnd="20dp"
+                android:scaleX="1.2"
+                android:scaleY="1.2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/view2"
+                app:thumbTint="@color/blue"
+                app:trackTint="@drawable/newtrack" />
+
+            <View
+                android:id="@+id/view3"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="30dp"
+                android:background="@color/gray_33"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_selected_deadline" />
+
+            <ImageView
+                android:id="@+id/image_view_delete_edit_work"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="23dp"
+                android:src="@drawable/delete"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/view3" />
+
+            <Button
+                android:id="@+id/button_delete_edit_work"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_marginStart="14dp"
+                android:layout_marginTop="6dp"
+                android:background="#00000000"
+                android:text="Удалить"
+                android:textAllCaps="false"
+                android:textColor="@color/red"
+                android:textSize="@dimen/title"
+                app:layout_constraintStart_toEndOf="@+id/image_view_delete_edit_work"
+                app:layout_constraintTop_toBottomOf="@+id/view3" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
