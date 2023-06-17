@@ -18,7 +18,9 @@ import com.example.todoapp.ui.Adapter.CustomRecyclerAdapter
 import com.example.todoapp.databinding.FragmentStartBinding
 import com.example.todoapp.ui.ViewModel.StartViewModel
 import com.example.todoapp.ui.gesture.SwipeGesture
+import com.google.android.material.appbar.AppBarLayout
 import java.lang.Exception
+import kotlin.math.abs
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -107,6 +109,7 @@ class StartFragment : Fragment() {
             mAdapter?.notifyDataSetChanged()
         })
 
+        hideCompletedTasksOnToolBar()
         swipeToGesture(recyclerView)
     }
 
@@ -127,28 +130,6 @@ class StartFragment : Fragment() {
                                 viewModel.removeWork(deleteItem)
                                 updateCounterUncompletedTasks()
                             }
-
-//                            val snackBar = Snackbar.make(this@StartFragment.recyclerView, "Item deleted", Snackbar.LENGTH_SHORT)
-//                                .addCallback(object :BaseTransientBottomBar.BaseCallback<Snackbar>(){
-//                                    override fun onShown(transientBottomBar: Snackbar?) {
-//                                        super.onShown(transientBottomBar)
-//
-//                                        transientBottomBar?.setAction("UNDO"){
-//
-//                                        }
-//                                    }
-//                                })
-//                                .apply {
-//                                    animationMode = Snackbar.ANIMATION_MODE_FADE
-//                                }
-//
-//                            snackBar.setActionTextColor(
-//                                ContextCompat.getColor(
-//                                    this@StartFragment.requireContext(),
-//                                    R.color.green
-//                                )
-//                            )
-//                            snackBar.show()
                         }
 
                     }
@@ -167,6 +148,21 @@ class StartFragment : Fragment() {
     private fun updateCounterUncompletedTasks(){
         val completedTaskString = "Выполнено - " + viewModel.getSizeCompletedTasks()
         binding.textViewCompletedTasks.text = completedTaskString
+    }
+
+    private fun hideCompletedTasksOnToolBar(){
+        binding.appBarLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+            run {
+                if (verticalOffset == 0) {
+                    // If expanded, then do this
+                    binding.textViewCompletedTasks.visibility = View.VISIBLE
+                }
+                else {
+                    // If collapsed || somewhere in between
+                    binding.textViewCompletedTasks.visibility = View.GONE
+                }
+            }
+        }
     }
 
     override fun onDestroyView() {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/Base.Theme.ToDoApp"
@@ -7,67 +7,79 @@
     android:layout_height="match_parent"
     tools:context=".ui.Fragment.StartFragment">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="60dp"
-        android:layout_marginTop="82dp"
-        android:text="Мои дела"
-        android:textColor="@color/white"
-        android:textSize="@dimen/large_title"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/text_view_completed_tasks"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="60dp"
-        android:layout_marginTop="6dp"
-        android:text="Выполнено - %null%"
-        android:textColor="@color/gray_66"
-        android:textSize="@dimen/title"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
-
-    <ImageButton
-        android:id="@+id/image_button_show_completed_tasks"
-        android:layout_width="44dp"
-        android:layout_height="42dp"
-        android:scaleY="1.3"
-        android:scaleX="1.3"
-        android:layout_marginEnd="28dp"
-        android:background="#00000000"
-        android:src="@drawable/visibility_off"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"/>
-
-    <FrameLayout
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingTop="190dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_height="170dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view"
+        <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="150dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/rounded_border"
-            android:backgroundTint="@color/black_25"
-            android:paddingTop="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView2"
-            tools:itemCount="6"
-            tools:listitem="@layout/work_item" />
-    </FrameLayout>
+            android:layout_height="match_parent"
+            android:background="@color/black_16"
+            app:expandedTitleMarginBottom="60dp"
+            app:expandedTitleMarginStart="60dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:title="Мои дела">
+
+            <ImageButton
+                android:id="@+id/image_button_show_completed_tasks"
+                android:layout_width="44dp"
+                android:layout_height="42dp"
+                android:layout_marginEnd="28dp"
+                android:layout_marginBottom="10dp"
+                android:background="#00000000"
+                android:scaleX="1.3"
+                android:scaleY="1.3"
+                android:layout_gravity="right|bottom"
+                android:src="@drawable/visibility_off" />
+
+            <TextView
+                android:id="@+id/text_view_completed_tasks"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="60dp"
+                android:layout_marginBottom="18dp"
+                android:text="Выполнено - %null%"
+                android:textColor="@color/gray_66"
+                android:textSize="@dimen/title"
+                android:layout_gravity="bottom"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+
+            <androidx.appcompat.widget.Toolbar
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                app:layout_collapseMode="pin">
+
+            </androidx.appcompat.widget.Toolbar>
+
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/rounded_border"
+        android:backgroundTint="@color/black_25"
+        android:minHeight="150dp"
+        android:paddingTop="8dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2"
+        tools:itemCount="6"
+        tools:listitem="@layout/work_item" />
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -85,4 +97,4 @@
         app:maxImageSize="28dp"
         app:srcCompat="@drawable/baseline_add_24" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

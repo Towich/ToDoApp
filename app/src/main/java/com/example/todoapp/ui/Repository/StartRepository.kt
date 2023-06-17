@@ -14,6 +14,7 @@ class StartRepository {
     init {
         works.value = mutableListOf()
         uncompletedTasks.value = mutableListOf()
+
         addWork(TodoItem("НАДО ЧТО-ТО КУПИТЬ!!", "Высокий"))
         addWork(TodoItem("ТОЧНО НАДО ЧТО-ТО КУПИТЬ", "Высокий"))
         addWork(TodoItem( "три", "низкая"))
@@ -24,6 +25,14 @@ class StartRepository {
         addWork(TodoItem( "уосемь", "Высокий"))
         addWork(TodoItem( "деват", "низкая"))
         addWork(TodoItem( "десат", "Высокий"))
+        addWork(TodoItem( "купить хлеб", "низкая"))
+        addWork(TodoItem( "купить молоко.", "Высокий"))
+        addWork(TodoItem( "квас", "Высокий"))
+        addWork(TodoItem( "картошка", "низкая"))
+        addWork(TodoItem( "лук", "низкая"))
+        addWork(TodoItem( "морковь", "Высокий"))
+        addWork(TodoItem( "приправа для плова", "низкая"))
+        addWork(TodoItem( "рис", "Высокий"))
     }
 
 
@@ -37,9 +46,6 @@ class StartRepository {
 
     fun getSizeCompletedTasks(): Int = works.value!!.size - uncompletedTasks.value!!.size
 
-    fun getWorkById(id: String): TodoItem? {
-        return works.value?.find { it.id == id }
-    }
     fun addWork(work: TodoItem){
         val newList = works.value!!.toMutableList()
         val newListUncompleted = uncompletedTasks.value!!.toMutableList()

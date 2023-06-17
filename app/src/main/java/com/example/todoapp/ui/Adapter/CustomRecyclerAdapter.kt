@@ -53,6 +53,19 @@ class CustomRecyclerAdapter(private var tasks: MutableLiveData<List<TodoItem>>)
                 updateStatusOfWork(holder.checkBox, !todoItem.completed, importance)
                 todoItem.completed = !todoItem.completed
 
+                if(todoItem.completed){
+                    val list = tasks.value!!.toMutableList()
+                    list.remove(todoItem)
+                    list.add(list.size, todoItem)
+                    tasks.value = list
+                }
+                else{
+                    val list = tasks.value!!.toMutableList()
+                    list.remove(todoItem)
+                    list.add(0, todoItem)
+                    tasks.value = list
+                }
+
                 if(onClickListenerCheckBoxButton != null){
                     onClickListenerCheckBoxButton!!.onClick(todoItem)
                 }
@@ -109,11 +122,10 @@ class CustomRecyclerAdapter(private var tasks: MutableLiveData<List<TodoItem>>)
         }
     }
 
-    // A function to bind the onclickListener.
+    // A functions to bind the onclickListeners.
     fun setOnClickListenerInfoButton(onClickListener: OnClickListener) {
         this.onClickListenerInfoButton = onClickListener
     }
-
     fun setOnClickListenerCheckBoxButton(onClickListener: OnClickListener) {
         this.onClickListenerCheckBoxButton = onClickListener
     }
