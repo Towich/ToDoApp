@@ -15,6 +15,8 @@ class StartViewModel: ViewModel() {
     private var currModel: TodoItem? = null
     private var isCurrEditing: Boolean? = null // Is current editing or creating a new work
 
+    private var completedTasks: Int = 0
+
     // Tasks
     fun getWorks() = works
 
@@ -69,5 +71,13 @@ class StartViewModel: ViewModel() {
     fun getAdapter(): CustomRecyclerAdapter = repository.getAdapter()
 
     fun setUncompletedTasks() = repository.setUncompletedTasks()
+
+    fun setAllTasks() = repository.setAllTasks()
+
+    fun getCompletedTasks() = completedTasks
+
+    fun increaseCompletedTasks(delta: Int){
+        completedTasks += delta
+    }
 
 }

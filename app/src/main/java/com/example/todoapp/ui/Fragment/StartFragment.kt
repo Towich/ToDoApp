@@ -60,10 +60,10 @@ class StartFragment : Fragment() {
         mAdapter.setOnClickListenerCheckBoxButton(object: CustomRecyclerAdapter.OnClickListener {
             override fun onClick(model: TodoItem) {
                 if (model.completed) {
-                    viewModel.removeUncompletedTask(model)
+                    viewModel.increaseCompletedTasks(1)
                 }
                 else{
-                    viewModel.addUncompletedTask(model)
+                    viewModel.increaseCompletedTasks(-1)
                 }
 
                 updateCounterUncompletedTasks()
@@ -94,7 +94,7 @@ class StartFragment : Fragment() {
                 binding.imageButtonShowCompletedTasks.setImageResource(R.drawable.visibility)
             }
             else{
-                //mAdapter.setTasks(viewModel.getWorks())
+                viewModel.setAllTasks()
                 binding.imageButtonShowCompletedTasks.setImageResource(R.drawable.visibility_off)
             }
         }
@@ -142,7 +142,7 @@ class StartFragment : Fragment() {
     }
 
     private fun updateCounterUncompletedTasks(){
-        val completedTaskString = "Выполнено - " + viewModel.getSizeCompletedTasks()
+        val completedTaskString = "Выполнено - " + viewModel.getCompletedTasks()
         binding.textViewCompletedTasks.text = completedTaskString
     }
 

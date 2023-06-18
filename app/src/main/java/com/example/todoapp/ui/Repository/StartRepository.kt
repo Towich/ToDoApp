@@ -1,5 +1,7 @@
 package com.example.todoapp.ui.Repository
 
+import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DiffUtil
 import com.example.todoapp.data.model.TodoItem
@@ -11,6 +13,9 @@ class StartRepository {
 
 
     private var tasks: MutableList<TodoItem> = mutableListOf()
+    private lateinit var newList: MutableList<TodoItem>
+    private var removedCompletedItems: MutableList<TodoItem> = mutableListOf()
+
     private val works: MutableLiveData<List<TodoItem>> = MutableLiveData<List<TodoItem>>()
     private val uncompletedTasks: MutableLiveData<List<TodoItem>> = MutableLiveData<List<TodoItem>>()
     private var currentId: String = "0"
@@ -41,25 +46,25 @@ class StartRepository {
 //        addWork(TodoItem( "приправа для плова", "низкая"))
 //        addWork(TodoItem( "рис", "Высокий"))
 
-        var list = mutableListOf<TodoItem>()
+        val list = mutableListOf<TodoItem>()
         list.add(TodoItem("НАДО ЧТО-ТО КУПИТЬ!!", "Высокий"))
         list.add(TodoItem("ТОЧНО НАДО ЧТО-ТО КУПИТЬ", "Высокий"))
-        list.add(TodoItem( "три", "низкая"))
-        list.add(TodoItem( "четары.", "Высокий"))
-        list.add(TodoItem("НАДО ЧТО-ТО КУПИТЬ!!", "Высокий"))
-        list.add(TodoItem("ТОЧНО НАДО ЧТО-ТО КУПИТЬ", "Высокий"))
-        list.add(TodoItem( "три", "низкая"))
-        list.add(TodoItem( "четары.", "Высокий"))
-        list.add(TodoItem("НАДО ЧТО-ТО КУПИТЬ!!", "Высокий"))
-        list.add(TodoItem("ТОЧНО НАДО ЧТО-ТО КУПИТЬ", "Высокий"))
-        list.add(TodoItem( "три", "низкая"))
-        list.add(TodoItem( "четары.", "Высокий"))
-        list.add(TodoItem("НАДО ЧТО-ТО КУПИТЬ!!", "Высокий"))
-        list.add(TodoItem("ТОЧНО НАДО ЧТО-ТО КУПИТЬ", "Высокий"))
-        list.add(TodoItem( "три", "низкая"))
-        list.add(TodoItem( "четары.", "Высокий"))
+        list.add(TodoItem( "трhfghи", "низкая"))
+        list.add(TodoItem( "чеgfhтары.", "Высокий"))
+        list.add(TodoItem("НАfghДО ЧТО-ТО КУПИТЬ!!", "Высокий"))
+        list.add(TodoItem("ТОЧНfghО НАДО ЧТО-ТО КУПИТЬ", "Высокий"))
+        list.add(TodoItem( "тfghdfgри", "низкая"))
+        list.add(TodoItem( "четаdfgdfры.", "Высокий"))
+        list.add(TodoItem("НАДОgdfgd ЧТО-ТО КУПИТЬ!!", "Высокий"))
+        list.add(TodoItem("ТОЧНОgdfg НАДО ЧТО-ТО КУПhfgИТЬ", "Высокий"))
+        list.add(TodoItem( "hfghтри", "низhкая"))
+        list.add(TodoItem( "четаdsfgdfры.", "Высокий"))
+        list.add(TodoItem("НАsdfsdДО ЧТО-ТО КУПИТЬ!!", "Высокий"))
+        list.add(TodoItem("ТОЧНО НАhfghfgО ЧТО-ТО КУПИТЬ", "Высокий"))
+        list.add(TodoItem( "трsdfsdи", "низкая"))
+        list.add(TodoItem( "четарhgfhfgы.", "Высокий"))
 
-        val diffCallback = UsersDiffCallback(mAdapter.getTasks(), list)
+        val diffCallback = UsersDiffCallback(mutableListOf(), mAdapter.getTasks())
         val diffResult = DiffUtil.calculateDiff(diffCallback)
 
         mAdapter.setTasks(list)
@@ -75,7 +80,7 @@ class StartRepository {
         return uncompletedTasks
     }
 
-    fun getSizeCompletedTasks(): Int = works.value!!.size - uncompletedTasks.value!!.size
+    fun getSizeCompletedTasks(): Int = removedCompletedItems.size
 
     fun addWork(work: TodoItem){
         val oldList = mAdapter.getTasks()
@@ -131,46 +136,44 @@ class StartRepository {
     fun getTask(index: Int) = mAdapter.getTasks()[index]
 
     fun setUncompletedTasks(){
-        tasks = mAdapter.getTasks()
         val oldList = mAdapter.getTasks()
-        val newList = mutableListOf<TodoItem>()
+        newList = mutableListOf()
+        removedCompletedItems = mutableListOf()
 
-        var i: Int = 0
-        for (item in oldList){
-            if (!item.completed) {
+        var i = 0
+        var removedItems = 0
+        for(item in oldList){
+            if(!item.completed){
                 newList.add(item)
             }
             else{
-                mAdapter.notifyItemRemoved(i)
+                removedCompletedItems.add(item)
+                mAdapter.notifyItemRemoved(i - removedItems)
+                removedItems++
             }
             i++
         }
 
-        val diffCallback = UsersDiffCallback(oldList, newList)
-        val diffResult = DiffUtil.calculateDiff(diffCallback)
-
         mAdapter.setTasks(newList)
-        diffResult.dispatchUpdatesTo(mAdapter)
-        //mAdapter.notifyDataSetChanged()
     }
 
-    fun setAllTasks(){
-        val oldList = tasks
-        val newList = mAdapter.getTasks()
 
-        var i: Int = 0
-        for (item in oldList){
-            if (item.completed) {
-                mAdapter.notifyItemInserted(i)
-                newList.add(i, item)
-            }
-            i++
+    fun setAllTasks(){ // TODO
+        val brandNewList = mutableListOf<TodoItem>()
+
+        for(item in mAdapter.getTasks()){
+            brandNewList.add(item)
         }
 
-        val diffCallback = UsersDiffCallback(oldList, newList)
-        val diffResult = DiffUtil.calculateDiff(diffCallback)
+        for (item in removedCompletedItems){
+            brandNewList.add(item)
+            mAdapter.notifyItemInserted(mAdapter.getTasks().size)
+        }
 
-        mAdapter.setTasks(newList)
-        diffResult.dispatchUpdatesTo(mAdapter)
+//        val diffCallback = UsersDiffCallback(mAdapter.getTasks(), tasks)
+//        val diffResult = DiffUtil.calculateDiff(diffCallback)
+
+        mAdapter.setTasks(brandNewList)
+//        diffResult.dispatchUpdatesTo(mAdapter)
     }
 }
