@@ -51,7 +51,7 @@ class StartFragment : Fragment() {
         recyclerView = binding.recyclerView
         recyclerView.layoutManager = LinearLayoutManager(context)
 
-        val mAdapter = CustomRecyclerAdapter(viewModel.getWorks())
+        val mAdapter = viewModel.getAdapter()
         recyclerView.adapter = mAdapter
 
         updateCounterUncompletedTasks()
@@ -90,24 +90,22 @@ class StartFragment : Fragment() {
             showingUncompletedTasks = !showingUncompletedTasks
 
             if(showingUncompletedTasks){
-                mAdapter.setTasks(viewModel.getUncompletedTasks())
+                viewModel.setUncompletedTasks()
                 binding.imageButtonShowCompletedTasks.setImageResource(R.drawable.visibility)
             }
             else{
-                mAdapter.setTasks(viewModel.getWorks())
+                //mAdapter.setTasks(viewModel.getWorks())
                 binding.imageButtonShowCompletedTasks.setImageResource(R.drawable.visibility_off)
             }
-
-            mAdapter?.notifyDataSetChanged()
         }
 
-        viewModel.getWorks().observe(viewLifecycleOwner, Observer { it?.let {
-            mAdapter?.notifyDataSetChanged() // yeeaahhh I know that it should be optimized
-        } })
-
-        viewModel.getUncompletedTasks().observe(viewLifecycleOwner, Observer {
-            mAdapter?.notifyDataSetChanged()
-        })
+//        viewModel.getWorks().observe(viewLifecycleOwner, Observer { it?.let {
+//            mAdapter?.notifyDataSetChanged() // yeeaahhh I know that it should be optimized
+//        } })
+//
+//        viewModel.getUncompletedTasks().observe(viewLifecycleOwner, Observer {
+//            mAdapter?.notifyDataSetChanged()
+//        })
 
         hideCompletedTasksOnToolBar()
         swipeToGesture(recyclerView)
@@ -126,10 +124,8 @@ class StartFragment : Fragment() {
 
                         ItemTouchHelper.LEFT->{
                             val deleteItem = viewModel.getWork(position)
-                            if (deleteItem != null) {
-                                viewModel.removeWork(deleteItem)
-                                updateCounterUncompletedTasks()
-                            }
+                            viewModel.removeWork(deleteItem, position)
+                            updateCounterUncompletedTasks()
                         }
 
                     }

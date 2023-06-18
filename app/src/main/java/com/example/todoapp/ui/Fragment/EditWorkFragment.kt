@@ -198,10 +198,10 @@ class EditWorkFragment : Fragment() {
         }
 
         // If we editing an existing task
-        binding.buttonDeleteEditWork.setOnClickListener {
-            startViewModel.getCurrModel()?.let { it1 -> startViewModel.removeWork(it1) }
-            mPopBackStack()
-        }
+//        binding.buttonDeleteEditWork.setOnClickListener {
+//            startViewModel.getCurrModel()?.let { it1 -> startViewModel.removeWork(it1) }
+//            mPopBackStack()
+//        }
     }
 
     private fun mPopBackStack(){

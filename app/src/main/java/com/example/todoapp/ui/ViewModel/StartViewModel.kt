@@ -3,6 +3,7 @@ package com.example.todoapp.ui.ViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.todoapp.data.model.TodoItem
+import com.example.todoapp.ui.Adapter.CustomRecyclerAdapter
 import com.example.todoapp.ui.Repository.StartRepository
 
 class StartViewModel: ViewModel() {
@@ -28,13 +29,13 @@ class StartViewModel: ViewModel() {
         repository.removeUncompletedTask(task)
     }
     fun getSizeCompletedTasks(): Int = repository.getSizeCompletedTasks()
-    fun removeWork(todoItem: TodoItem){
-        repository.removeWork(todoItem)
+    fun removeWork(todoItem: TodoItem, position: Int){
+        repository.removeWork(position)
 
         if(!todoItem.completed)
             repository.removeUncompletedTask(todoItem)
     }
-    fun getWork(index: Int) = works.value?.get(index)
+    fun getWork(index: Int) = repository.getTask(index)
 
     // Current model
     fun setCurrModel(newModel: TodoItem){
@@ -64,5 +65,9 @@ class StartViewModel: ViewModel() {
     fun getCurrentDate(): List<Int> {
         return repository.getCurrentDate()
     }
+
+    fun getAdapter(): CustomRecyclerAdapter = repository.getAdapter()
+
+    fun setUncompletedTasks() = repository.setUncompletedTasks()
 
 }

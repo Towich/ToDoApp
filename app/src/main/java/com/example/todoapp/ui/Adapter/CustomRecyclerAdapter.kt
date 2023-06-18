@@ -9,11 +9,12 @@ import android.widget.CompoundButton
 import android.widget.ImageButton
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.R
 import com.example.todoapp.data.model.TodoItem
 
-class CustomRecyclerAdapter(private var tasks: MutableLiveData<List<TodoItem>>)
+class CustomRecyclerAdapter(private var tasks: MutableList<TodoItem>)
     : RecyclerView.Adapter<CustomRecyclerAdapter.MyViewHolder>() {
 
     private var onClickListenerCheckBoxButton: OnClickListener? = null
@@ -31,14 +32,13 @@ class CustomRecyclerAdapter(private var tasks: MutableLiveData<List<TodoItem>>)
     }
 
     override fun getItemCount(): Int {
-        if(tasks.value != null)
-            return tasks.value!!.size
+        return tasks.size
         return 0
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
 
-        val todoItem: TodoItem = tasks.value?.get(position) ?: return
+        val todoItem: TodoItem = tasks.get(position) ?: return
 
         holder.checkBox.text = todoItem.textCase
         holder.checkBox.isChecked = todoItem.completed
@@ -54,16 +54,16 @@ class CustomRecyclerAdapter(private var tasks: MutableLiveData<List<TodoItem>>)
                 todoItem.completed = !todoItem.completed
 
                 if(todoItem.completed){
-                    val list = tasks.value!!.toMutableList()
+                    val list = tasks.toMutableList()
                     list.remove(todoItem)
                     list.add(list.size, todoItem)
-                    tasks.value = list
+                    tasks = list
                 }
                 else{
-                    val list = tasks.value!!.toMutableList()
+                    val list = tasks.toMutableList()
                     list.remove(todoItem)
                     list.add(0, todoItem)
-                    tasks.value = list
+                    tasks = list
                 }
 
                 if(onClickListenerCheckBoxButton != null){
@@ -130,7 +130,8 @@ class CustomRecyclerAdapter(private var tasks: MutableLiveData<List<TodoItem>>)
         this.onClickListenerCheckBoxButton = onClickListener
     }
 
-    fun setTasks(tasks: MutableLiveData<List<TodoItem>>){
+    fun getTasks(): MutableList<TodoItem> = tasks
+    fun setTasks(tasks: MutableList<TodoItem>){
         this.tasks = tasks
     }
 
@@ -139,6 +140,5 @@ class CustomRecyclerAdapter(private var tasks: MutableLiveData<List<TodoItem>>)
         fun onClick(model: TodoItem)
     }
 
-
-
 }
+
