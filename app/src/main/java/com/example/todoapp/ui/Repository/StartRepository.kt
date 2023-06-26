@@ -4,13 +4,22 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DiffUtil
+import com.example.todoapp.data.Dependencies
+import com.example.todoapp.data.db.TaskDao
+import com.example.todoapp.data.db.TaskEntity
 import com.example.todoapp.data.model.TodoItem
 import com.example.todoapp.ui.Adapter.CustomRecyclerAdapter
 import com.example.todoapp.ui.Adapter.UsersDiffCallback
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 
-class StartRepository {
-
+class StartRepository(private val taskDao: TaskDao) {
 
     private var tasks: MutableList<TodoItem> = mutableListOf()
     private lateinit var newList: MutableList<TodoItem>
@@ -69,8 +78,19 @@ class StartRepository {
 
         mAdapter.setTasks(list)
         diffResult.dispatchUpdatesTo(mAdapter)
+
+        //addTask()
     }
 
+    fun addTask(taskEntity: TaskEntity) = runBlocking{
+        launch {
+            withContext(Dispatchers.IO){
+                //taskDao.insertTask(TaskEntity(1, "мойтекст", "Важный", "27 июня", true))
+                taskDao.insertTask(taskEntity)
+            }
+
+        }
+    }
 
     fun getWorks(): MutableLiveData<List<TodoItem>> {
         return works
@@ -90,6 +110,7 @@ class StartRepository {
         currentId = (currentId.toInt() + 1).toString()
 
         newList.add(work)
+        addTask(work.toEntity())
 
         val diffCallback = UsersDiffCallback(oldList, newList)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
@@ -158,7 +179,7 @@ class StartRepository {
     }
 
 
-    fun setAllTasks(){ // TODO
+    fun setAllTasks(){
         val brandNewList = mutableListOf<TodoItem>()
 
         for(item in mAdapter.getTasks()){

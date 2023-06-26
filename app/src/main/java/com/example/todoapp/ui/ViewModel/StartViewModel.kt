@@ -2,13 +2,17 @@ package com.example.todoapp.ui.ViewModel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.todoapp.data.Dependencies
 import com.example.todoapp.data.model.TodoItem
 import com.example.todoapp.ui.Adapter.CustomRecyclerAdapter
 import com.example.todoapp.ui.Repository.StartRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 class StartViewModel: ViewModel() {
 
-    private val repository = StartRepository()
+    private val repository by lazy { Dependencies.startRepository }
     private var works: MutableLiveData<List<TodoItem>> = repository.getWorks()
     private var uncompletedTasks: MutableLiveData<List<TodoItem>> = repository.getUncompletedTasks()
 
@@ -16,6 +20,10 @@ class StartViewModel: ViewModel() {
     private var isCurrEditing: Boolean? = null // Is current editing or creating a new work
 
     private var completedTasks: Int = 0
+
+    fun addTask(){
+        //TODO repository.addTask(viewModelScope)
+    }
 
     // Tasks
     fun getWorks() = works

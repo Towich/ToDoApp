@@ -125,6 +125,10 @@ class StartFragment : Fragment() {
                         ItemTouchHelper.LEFT->{
                             val deleteItem = viewModel.getWork(position)
                             viewModel.removeWork(deleteItem, position)
+
+                            if(deleteItem.completed)
+                                viewModel.increaseCompletedTasks(-1)
+
                             updateCounterUncompletedTasks()
                         }
 
