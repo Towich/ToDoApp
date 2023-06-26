@@ -12,7 +12,7 @@ interface TaskDao {
     @Query("SELECT * FROM task")
     fun getAllTasks(): List<TaskEntity>
 
-    @Insert(entity = TaskEntity::class, onConflict = OnConflictStrategy.IGNORE)
+    @Insert(entity = TaskEntity::class, onConflict = OnConflictStrategy.NONE)
     fun insertTask(taskEntity: TaskEntity)
 
     @Delete
