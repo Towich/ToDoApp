@@ -1,7 +1,6 @@
 package com.example.todoapp.ui.Fragment
 
 import android.app.DatePickerDialog
-import android.graphics.PorterDuff
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -14,15 +13,11 @@ import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import com.example.todoapp.R
 import com.example.todoapp.data.model.TodoItem
-import com.example.todoapp.data.source.StartDataSource
 import com.example.todoapp.databinding.FragmentEditWorkBinding
 import com.example.todoapp.ui.ViewModel.StartViewModel
-import java.util.Calendar
-import javax.xml.datatype.DatatypeConstants.MONTHS
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
@@ -169,9 +164,15 @@ class EditWorkFragment : Fragment() {
                 startViewModel.getCurrModel()?.deadlineData = binding.textViewSelectedDeadline.text.toString()
             }
             else{ // create a new work
-                val newWork = TodoItem(binding.editText.text.toString(), importance, binding.textViewSelectedDeadline.text.toString())
+                val newWork = TodoItem(
+                    0,
+                    binding.editText.text.toString(),
+                    importance,
+                    binding.textViewSelectedDeadline.text.toString(),
+                    false
+                )
                 Toast.makeText(context, newWork.toString(), Toast.LENGTH_SHORT).show()
-                startViewModel.addWork(newWork)
+                startViewModel.addTask(newWork)
             }
 
             mPopBackStack()

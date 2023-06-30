@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.R
 import com.example.todoapp.data.model.TodoItem
 
-class CustomRecyclerAdapter(private var tasks: MutableList<TodoItem>)
+class CustomRecyclerAdapter(private var tasks: List<TodoItem>)
     : RecyclerView.Adapter<CustomRecyclerAdapter.MyViewHolder>() {
 
     private var onClickListenerCheckBoxButton: OnClickListener? = null
@@ -129,8 +129,8 @@ class CustomRecyclerAdapter(private var tasks: MutableList<TodoItem>)
         this.onClickListenerCheckBoxButton = onClickListener
     }
 
-    fun getTasks(): MutableList<TodoItem> = tasks
-    fun setTasks(tasks: MutableList<TodoItem>){
+    fun getTasks(): List<TodoItem> = tasks
+    fun setTasks(tasks: List<TodoItem>){
         this.tasks = tasks
     }
 

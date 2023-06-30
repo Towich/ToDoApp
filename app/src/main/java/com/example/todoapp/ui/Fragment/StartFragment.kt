@@ -89,14 +89,14 @@ class StartFragment : Fragment() {
         binding.imageButtonShowCompletedTasks.setOnClickListener {
             showingUncompletedTasks = !showingUncompletedTasks
 
-            if(showingUncompletedTasks){
-                viewModel.setUncompletedTasks()
-                binding.imageButtonShowCompletedTasks.setImageResource(R.drawable.visibility)
-            }
-            else{
-                viewModel.setAllTasks()
-                binding.imageButtonShowCompletedTasks.setImageResource(R.drawable.visibility_off)
-            }
+//            if(showingUncompletedTasks){
+//                viewModel.setUncompletedTasks()
+//                binding.imageButtonShowCompletedTasks.setImageResource(R.drawable.visibility)
+//            }
+//            else{
+//                viewModel.setAllTasks()
+//                binding.imageButtonShowCompletedTasks.setImageResource(R.drawable.visibility_off)
+//            }
         }
 
 //        viewModel.getWorks().observe(viewLifecycleOwner, Observer { it?.let {
@@ -107,6 +107,7 @@ class StartFragment : Fragment() {
 //            mAdapter?.notifyDataSetChanged()
 //        })
 
+        viewModel.getTasks()
         hideCompletedTasksOnToolBar()
         swipeToGesture(recyclerView)
     }
@@ -124,7 +125,7 @@ class StartFragment : Fragment() {
 
                         ItemTouchHelper.LEFT->{
                             val deleteItem = viewModel.getWork(position)
-                            viewModel.removeWork(deleteItem, position)
+                            viewModel.removeTask(deleteItem)
 
                             if(deleteItem.completed)
                                 viewModel.increaseCompletedTasks(-1)
