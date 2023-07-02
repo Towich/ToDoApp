@@ -39,6 +39,16 @@ class StartViewModel: ViewModel() {
 //        if(!todoItem.completed)
 //            repository.removeUncompletedTask(todoItem)
     }
+
+    fun updateTask(todoItem: TodoItem){
+        viewModelScope.launch {
+            repository.updateTask(todoItem)
+        }
+    }
+
+    fun updateTaskInAdapter(todoItem: TodoItem){
+        repository.updateTaskInAdapter(todoItem)
+    }
     fun getWork(index: Int) = repository.getTask(index)
 
     // Current model

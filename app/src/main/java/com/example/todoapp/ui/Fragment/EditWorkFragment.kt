@@ -157,11 +157,16 @@ class EditWorkFragment : Fragment() {
             if(importance.equals("!!Высокий"))
                 importance = importance.drop(2)
 
+
             // edit existing work
             if(startViewModel.isCurrEditing() == true){
-                startViewModel.getCurrModel()?.textCase = binding.editText.text.toString()
-                startViewModel.getCurrModel()?.importance = importance
-                startViewModel.getCurrModel()?.deadlineData = binding.textViewSelectedDeadline.text.toString()
+                val currModel = startViewModel.getCurrModel() ?: return@setOnClickListener
+                currModel.textCase = binding.editText.text.toString()
+                currModel.importance = importance
+                currModel.deadlineData = binding.textViewSelectedDeadline.text.toString()
+
+                startViewModel.updateTask(currModel)
+                startViewModel.updateTaskInAdapter(currModel)
             }
             else{ // create a new work
                 val newWork = TodoItem(

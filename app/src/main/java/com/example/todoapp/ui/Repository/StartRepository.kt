@@ -89,6 +89,27 @@ class StartRepository(
 //        mAdapter.notifyItemRemoved(position)
     }
 
+    suspend fun updateTask(todoItem: TodoItem){
+        withContext(Dispatchers.IO){
+            taskDao.updateEntity(todoItem.id, todoItem.textCase, todoItem.importance, todoItem.deadlineData, todoItem.completed)
+        }
+    }
+
+    fun updateTaskInAdapter(todoItem: TodoItem){
+        val newList = mutableListOf<TodoItem>()
+
+        for(index in tasks.indices){
+            if(tasks[index].id == todoItem.id){
+                newList.add(todoItem)
+            }
+            else{
+                newList.add(tasks[index])
+            }
+        }
+
+        mAdapter.setTasks(newList)
+    }
+
     fun getCurrentDate(): List<Int> {
         val c = Calendar.getInstance()
         val year = c.get(Calendar.YEAR)

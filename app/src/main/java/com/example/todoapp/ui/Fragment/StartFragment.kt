@@ -66,6 +66,7 @@ class StartFragment : Fragment() {
                     viewModel.increaseCompletedTasks(-1)
                 }
 
+                viewModel.updateTask(model)
                 updateCounterUncompletedTasks()
             }
         })
