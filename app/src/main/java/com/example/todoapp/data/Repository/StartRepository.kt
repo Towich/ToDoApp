@@ -1,7 +1,8 @@
-package com.example.todoapp.ui.Repository
+package com.example.todoapp.data.Repository
 
 import androidx.recyclerview.widget.DiffUtil
 import com.example.todoapp.data.db.TaskDao
+import com.example.todoapp.data.db.TaskEntity
 import com.example.todoapp.data.model.TodoItem
 import com.example.todoapp.ui.Adapter.CustomRecyclerAdapter
 import com.example.todoapp.ui.Adapter.UsersDiffCallback
@@ -57,21 +58,29 @@ class StartRepository(
     }
 
     suspend fun getTasks(): List<TodoItem> {
-        val listTodoItem = transformTasks()
-        tasks = listTodoItem
-        mAdapter.setTasks(listTodoItem)
-        return listTodoItem
+        tasks = transformTasks(false)
+        return tasks
     }
 
-    suspend fun transformTasks(): List<TodoItem> = withContext(Dispatchers.IO) {
+    suspend fun getAllUncompletedTasks(): List<TodoItem> {
+        return transformTasks(true)
+    }
+
+    suspend fun transformTasks(isGetUncompletedTasks: Boolean): List<TodoItem> = withContext(Dispatchers.IO) {
         val newList = mutableListOf<TodoItem>()
-        val dbList = taskDao.getAllTasks()
+
+        val dbList: List<TaskEntity> = if(isGetUncompletedTasks)
+            taskDao.getAllUncompletedTasks()
+        else{
+            taskDao.getAllTasks()
+        }
 
         for (e in dbList) {
             newList.add(e.toModel())
         }
         return@withContext newList
     }
+
 
     suspend fun removeWork(todoItem: TodoItem) {
         val oldWorks = mAdapter.getTasks()

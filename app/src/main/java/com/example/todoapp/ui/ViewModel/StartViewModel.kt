@@ -1,12 +1,10 @@
 package com.example.todoapp.ui.ViewModel
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.todoapp.data.Dependencies
 import com.example.todoapp.data.model.TodoItem
 import com.example.todoapp.ui.Adapter.CustomRecyclerAdapter
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class StartViewModel: ViewModel() {
@@ -24,20 +22,25 @@ class StartViewModel: ViewModel() {
         repository.addTask(todoItem)
     }
 
-    fun getTasks() {
+    fun setupTasks() {
         viewModelScope.launch {
             val tasksList = repository.getTasks()
             repository.setAllTasks(tasksList)
         }
     }
+
+    fun setupUncompletedTasks(){
+        viewModelScope.launch {
+            val tasksList = repository.getAllUncompletedTasks()
+
+            repository.setAllTasks(tasksList)
+        }
+
+    }
     fun removeTask(todoItem: TodoItem){
         viewModelScope.launch {
             repository.removeWork(todoItem)
         }
-
-
-//        if(!todoItem.completed)
-//            repository.removeUncompletedTask(todoItem)
     }
 
     fun updateTask(todoItem: TodoItem){

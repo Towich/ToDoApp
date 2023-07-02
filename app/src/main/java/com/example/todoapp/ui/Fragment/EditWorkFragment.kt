@@ -178,6 +178,7 @@ class EditWorkFragment : Fragment() {
                 )
                 Toast.makeText(context, newWork.toString(), Toast.LENGTH_SHORT).show()
                 startViewModel.addTask(newWork)
+                startViewModel.increaseCompletedTasks(1)
             }
 
             mPopBackStack()

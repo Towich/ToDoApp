@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.todoapp.data.db.AppDatabase
 import com.example.todoapp.data.db.TaskDao
-import com.example.todoapp.ui.Repository.StartRepository
+import com.example.todoapp.data.Repository.StartRepository
 
 object Dependencies {
 
