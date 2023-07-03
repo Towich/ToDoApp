@@ -16,6 +16,9 @@ interface TaskDao {
     @Query("SELECT * FROM task WHERE completed = 0")
     fun getAllUncompletedTasks(): List<TaskEntity>
 
+    @Query("SELECT * FROM task WHERE completed = 1")
+    fun getAllCompletedTasks(): List<TaskEntity>
+
     @Insert(entity = TaskEntity::class, onConflict = OnConflictStrategy.NONE)
     fun insertTask(taskEntity: TaskEntity)
 

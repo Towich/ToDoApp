@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,7 +28,6 @@ class StartFragment : Fragment() {
     private var _binding: FragmentStartBinding? = null
     private val viewModel: StartViewModel by activityViewModels()
     private lateinit var recyclerView: RecyclerView
-    private var showingUncompletedTasks: Boolean = false
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -51,7 +51,7 @@ class StartFragment : Fragment() {
         val mAdapter = viewModel.getAdapter()
         recyclerView.adapter = mAdapter
 
-        updateCounterUncompletedTasks()
+        viewModel.setupQuantityOfCompletedTasks()
 
         // onClick CheckBox on todoItem
         mAdapter.setOnClickListenerCheckBoxButton(object: CustomRecyclerAdapter.OnClickListener {
@@ -63,8 +63,13 @@ class StartFragment : Fragment() {
                     viewModel.increaseCompletedTasks(-1)
                 }
 
+                viewModel.updateTaskInAdapter(model)
                 viewModel.updateTask(model)
-                updateCounterUncompletedTasks()
+
+                //TODO
+//                if(viewModel.showingUncompletedTasks && model.completed){
+//                    viewModel.removeTaskFromAdapter(model)
+//                }
             }
         })
 
@@ -85,9 +90,9 @@ class StartFragment : Fragment() {
 
         // onClick "Eye"
         binding.imageButtonShowCompletedTasks.setOnClickListener {
-            showingUncompletedTasks = !showingUncompletedTasks
+            viewModel.showingUncompletedTasks = !viewModel.showingUncompletedTasks
 
-            if(showingUncompletedTasks){
+            if(viewModel.showingUncompletedTasks){
                 viewModel.setupUncompletedTasks()
                 binding.imageButtonShowCompletedTasks.setImageResource(R.drawable.visibility)
             }
@@ -97,7 +102,16 @@ class StartFragment : Fragment() {
             }
         }
 
-        viewModel.setupTasks()
+        viewModel.completedTasks.observe(viewLifecycleOwner, Observer {
+            val completedTaskString = "Выполнено - " + viewModel.completedTasks.value
+            binding.textViewCompletedTasks.text = completedTaskString
+        })
+
+        if(viewModel.showingUncompletedTasks)
+            viewModel.setupUncompletedTasks()
+        else
+            viewModel.setupTasks()
+
         hideCompletedTasksOnToolBar()
         swipeToGesture(recyclerView)
     }
@@ -114,13 +128,11 @@ class StartFragment : Fragment() {
                     when(direction){
 
                         ItemTouchHelper.LEFT->{
-                            val deleteItem = viewModel.getWork(position)
+                            val deleteItem = viewModel.getAdapter().getTasks()[position]
                             viewModel.removeTask(deleteItem)
 
                             if(deleteItem.completed)
                                 viewModel.increaseCompletedTasks(-1)
-
-                            updateCounterUncompletedTasks()
                         }
 
                     }
@@ -136,13 +148,13 @@ class StartFragment : Fragment() {
         touchHelper.attachToRecyclerView(itemRecyclerView)
     }
 
-    private fun updateCounterUncompletedTasks(){
-        val completedTaskString = "Выполнено - " + viewModel.getCompletedTasks()
-        binding.textViewCompletedTasks.text = completedTaskString
-    }
+//    private fun updateCounterUncompletedTasks(){
+//        val completedTaskString = "Выполнено - " + viewModel.getCompletedTasks()
+//        binding.textViewCompletedTasks.text = completedTaskString
+//    }
 
     private fun hideCompletedTasksOnToolBar(){
-        binding.appBarLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+        binding.appBarLayout.addOnOffsetChangedListener { _, verticalOffset ->
             run {
                 if (verticalOffset == 0) {
                     // If expanded, then do this

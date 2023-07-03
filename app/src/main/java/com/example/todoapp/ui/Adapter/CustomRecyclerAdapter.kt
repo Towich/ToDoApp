@@ -52,19 +52,6 @@ class CustomRecyclerAdapter(private var tasks: List<TodoItem>)
                 updateStatusOfWork(holder.checkBox, !todoItem.completed, importance)
                 todoItem.completed = !todoItem.completed
 
-//                if(todoItem.completed){
-//                    val list = tasks.toMutableList()
-//                    list.remove(todoItem)
-//                    list.add(list.size, todoItem)
-//                    tasks = list
-//                }
-//                else{
-//                    val list = tasks.toMutableList()
-//                    list.remove(todoItem)
-//                    list.add(0, todoItem)
-//                    tasks = list
-//                }
-
                 if(onClickListenerCheckBoxButton != null){
                     onClickListenerCheckBoxButton!!.onClick(todoItem)
                 }

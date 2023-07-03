@@ -1,5 +1,6 @@
 package com.example.todoapp.ui.ViewModel
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.todoapp.data.Dependencies
@@ -14,7 +15,8 @@ class StartViewModel: ViewModel() {
     private var currModel: TodoItem? = null
     private var isCurrEditing: Boolean? = null // Is current editing or creating a new work
 
-    private var completedTasks: Int = 0
+    var completedTasks: MutableLiveData<Int> = repository.completedTasks
+    var showingUncompletedTasks: Boolean = false
 
 
     // Tasks
@@ -37,10 +39,23 @@ class StartViewModel: ViewModel() {
         }
 
     }
+
+    fun setupQuantityOfCompletedTasks(){
+        viewModelScope.launch {
+            val tasksList = repository.getAllCompletedTasks()
+
+            completedTasks.value = tasksList.size
+        }
+    }
+
     fun removeTask(todoItem: TodoItem){
         viewModelScope.launch {
             repository.removeWork(todoItem)
         }
+    }
+
+    fun removeTaskFromAdapter(todoItem: TodoItem){
+        repository.removeTaskFromAdapter(todoItem)
     }
 
     fun updateTask(todoItem: TodoItem){
@@ -85,14 +100,8 @@ class StartViewModel: ViewModel() {
 
     fun getAdapter(): CustomRecyclerAdapter = repository.getAdapter()
 
-//    fun setUncompletedTasks() = repository.setUncompletedTasks()
-
-//    fun setAllTasks() = repository.setAllTasks()
-
-    fun getCompletedTasks() = completedTasks
-
     fun increaseCompletedTasks(delta: Int){
-        completedTasks += delta
+        completedTasks.value = completedTasks.value?.plus(delta)
     }
 
 }

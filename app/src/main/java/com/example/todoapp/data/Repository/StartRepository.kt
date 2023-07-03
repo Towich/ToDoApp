@@ -1,5 +1,6 @@
 package com.example.todoapp.data.Repository
 
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DiffUtil
 import com.example.todoapp.data.db.TaskDao
 import com.example.todoapp.data.db.TaskEntity
@@ -12,10 +13,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.util.Calendar
 
-class StartRepository(
-    private val taskDao: TaskDao
-    )
-{
+class StartRepository(private val taskDao: TaskDao) {
 
     private var tasks: List<TodoItem> = listOf()
 
@@ -35,6 +33,7 @@ class StartRepository(
     )
 
     private val mAdapter = CustomRecyclerAdapter(mutableListOf())
+    var completedTasks: MutableLiveData<Int> = MutableLiveData()
 
     init {
 
@@ -66,56 +65,89 @@ class StartRepository(
         return transformTasks(true)
     }
 
-    suspend fun transformTasks(isGetUncompletedTasks: Boolean): List<TodoItem> = withContext(Dispatchers.IO) {
+    suspend fun getAllCompletedTasks(): List<TodoItem> = withContext(Dispatchers.IO) {
         val newList = mutableListOf<TodoItem>()
 
-        val dbList: List<TaskEntity> = if(isGetUncompletedTasks)
-            taskDao.getAllUncompletedTasks()
-        else{
-            taskDao.getAllTasks()
-        }
-
+        val dbList = taskDao.getAllCompletedTasks()
         for (e in dbList) {
             newList.add(e.toModel())
         }
+
         return@withContext newList
     }
+
+    suspend fun transformTasks(isGetUncompletedTasks: Boolean): List<TodoItem> =
+        withContext(Dispatchers.IO) {
+            val newList = mutableListOf<TodoItem>()
+
+            val dbList: List<TaskEntity> = if (isGetUncompletedTasks)
+                taskDao.getAllUncompletedTasks()
+            else {
+                taskDao.getAllTasks()
+            }
+
+            for (e in dbList) {
+                newList.add(e.toModel())
+            }
+            return@withContext newList
+        }
 
 
     suspend fun removeWork(todoItem: TodoItem) {
         val oldWorks = mAdapter.getTasks()
         val newWorks = mAdapter.getTasks().minus(todoItem)
 
-        withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO) {
             taskDao.deleteTaskById(todoItem.id)
         }
 
         val diffCallback = UsersDiffCallback(oldWorks, newWorks)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
 
+        tasks = newWorks
         mAdapter.setTasks(newWorks)
         diffResult.dispatchUpdatesTo(mAdapter)
-//        mAdapter.notifyItemRemoved(position)
     }
 
-    suspend fun updateTask(todoItem: TodoItem){
-        withContext(Dispatchers.IO){
-            taskDao.updateEntity(todoItem.id, todoItem.textCase, todoItem.importance, todoItem.deadlineData, todoItem.completed)
+    fun removeTaskFromAdapter(todoItem: TodoItem){
+        val newList = mAdapter.getTasks().toMutableList()
+
+//        for (index in mAdapter.getTasks().indices) {
+//            if (mAdapter.getTasks()[index].id == todoItem.id) {
+//                continue
+//            } else {
+//                newList.add(mAdapter.getTasks()[index])
+//            }
+//        }
+
+
+        mAdapter.setTasks(newList.minus(todoItem))
+    }
+
+    suspend fun updateTask(todoItem: TodoItem) {
+        withContext(Dispatchers.IO) {
+            taskDao.updateEntity(
+                todoItem.id,
+                todoItem.textCase,
+                todoItem.importance,
+                todoItem.deadlineData,
+                todoItem.completed
+            )
         }
     }
 
-    fun updateTaskInAdapter(todoItem: TodoItem){
+    fun updateTaskInAdapter(todoItem: TodoItem) {
         val newList = mutableListOf<TodoItem>()
 
-        for(index in tasks.indices){
-            if(tasks[index].id == todoItem.id){
+        for (index in mAdapter.getTasks().indices) {
+            if (mAdapter.getTasks()[index].id == todoItem.id) {
                 newList.add(todoItem)
-            }
-            else{
-                newList.add(tasks[index])
+            } else {
+                newList.add(mAdapter.getTasks()[index])
             }
         }
 
+        tasks = newList
         mAdapter.setTasks(newList)
     }
 
