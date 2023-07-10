@@ -2,8 +2,8 @@ package com.example.todoapp.data.Repository
 
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DiffUtil
-import com.example.todoapp.data.db.TaskDao
-import com.example.todoapp.data.db.TaskEntity
+import com.example.todoapp.data.database.TaskDao
+import com.example.todoapp.data.database.TaskEntity
 import com.example.todoapp.data.model.TodoItem
 import com.example.todoapp.ui.Adapter.CustomRecyclerAdapter
 import com.example.todoapp.ui.Adapter.UsersDiffCallback
@@ -12,8 +12,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.util.Calendar
+import javax.inject.Inject
 
-class StartRepository(private val taskDao: TaskDao) {
+class StartRepository @Inject constructor(private val taskDao: TaskDao) {
 
     private var tasks: List<TodoItem> = listOf()
 

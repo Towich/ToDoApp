@@ -1,8 +1,6 @@
-package com.example.todoapp.data.db
+package com.example.todoapp.data.database
 
-import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(entities = [TaskEntity::class], version = 7, exportSchema = false)

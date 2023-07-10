@@ -1,23 +1,32 @@
 package com.example.todoapp.ui.ViewModel
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.todoapp.data.Dependencies
+import com.example.todoapp.App
+import com.example.todoapp.data.Repository.StartRepository
 import com.example.todoapp.data.model.TodoItem
 import com.example.todoapp.ui.Adapter.CustomRecyclerAdapter
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class StartViewModel: ViewModel() {
+class StartViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository by lazy { Dependencies.startRepository }
+    @Inject
+    lateinit var repository: StartRepository
 
     private var currModel: TodoItem? = null
     private var isCurrEditing: Boolean? = null // Is current editing or creating a new work
 
-    var completedTasks: MutableLiveData<Int> = repository.completedTasks
+    var completedTasks: MutableLiveData<Int>
     var showingUncompletedTasks: Boolean = false
 
+    init {
+        // Injecting this ViewModel
+        (application as App).appComponent.inject(this)
+        completedTasks = repository.completedTasks
+    }
 
     // Tasks
     fun addTask(todoItem: TodoItem){
@@ -53,11 +62,6 @@ class StartViewModel: ViewModel() {
             repository.removeWork(todoItem)
         }
     }
-
-    fun removeTaskFromAdapter(todoItem: TodoItem){
-        repository.removeTaskFromAdapter(todoItem)
-    }
-
     fun updateTask(todoItem: TodoItem){
         viewModelScope.launch {
             repository.updateTask(todoItem)
@@ -67,7 +71,6 @@ class StartViewModel: ViewModel() {
     fun updateTaskInAdapter(todoItem: TodoItem){
         repository.updateTaskInAdapter(todoItem)
     }
-    fun getWork(index: Int) = repository.getTask(index)
 
     // Current model
     fun setCurrModel(newModel: TodoItem){

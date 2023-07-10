@@ -21,11 +21,13 @@ import com.example.todoapp.ui.gesture.SwipeGesture
 import java.lang.Exception
 
 /**
- * A simple [Fragment] subclass as the default destination in the navigation.
+ * A fragment which shows and controls the list of tasks.
  */
 class StartFragment : Fragment() {
 
     private var _binding: FragmentStartBinding? = null
+
+    // Shared ViewModel
     private val viewModel: StartViewModel by activityViewModels()
     private lateinit var recyclerView: RecyclerView
 
@@ -45,9 +47,11 @@ class StartFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Connecting RecyclerView
         recyclerView = binding.recyclerView
         recyclerView.layoutManager = LinearLayoutManager(context)
 
+        // Creating Adapter for RecyclerView
         val mAdapter = viewModel.getAdapter()
         recyclerView.adapter = mAdapter
 
@@ -65,11 +69,6 @@ class StartFragment : Fragment() {
 
                 viewModel.updateTaskInAdapter(model)
                 viewModel.updateTask(model)
-
-                //TODO
-//                if(viewModel.showingUncompletedTasks && model.completed){
-//                    viewModel.removeTaskFromAdapter(model)
-//                }
             }
         })
 
@@ -82,13 +81,13 @@ class StartFragment : Fragment() {
             }
         })
 
-        // onClick FAB
+        // onClick FAB - create a new task
         binding.fab.setOnClickListener {
             view.findNavController().navigate(R.id.action_StartFragment_to_EditWorkFragment)
             viewModel.setCurrEditing(false)
         }
 
-        // onClick "Eye"
+        // onClick "Eye" - hide completed tasks
         binding.imageButtonShowCompletedTasks.setOnClickListener {
             viewModel.showingUncompletedTasks = !viewModel.showingUncompletedTasks
 
@@ -102,6 +101,7 @@ class StartFragment : Fragment() {
             }
         }
 
+        // LiveData with count of completed tasks
         viewModel.completedTasks.observe(viewLifecycleOwner, Observer {
             val completedTaskString = "Выполнено - " + viewModel.completedTasks.value
             binding.textViewCompletedTasks.text = completedTaskString
@@ -116,6 +116,8 @@ class StartFragment : Fragment() {
         swipeToGesture(recyclerView)
     }
 
+    // Tracking the gesture "swiping left"
+    // - then task has swiped left, removing it
     private fun swipeToGesture(itemRecyclerView: RecyclerView?){
 
         val swipeGesture = object : SwipeGesture(requireContext()){
@@ -148,11 +150,8 @@ class StartFragment : Fragment() {
         touchHelper.attachToRecyclerView(itemRecyclerView)
     }
 
-//    private fun updateCounterUncompletedTasks(){
-//        val completedTaskString = "Выполнено - " + viewModel.getCompletedTasks()
-//        binding.textViewCompletedTasks.text = completedTaskString
-//    }
-
+    // Hide TextView "Completed Tasks"
+    // then toolbar is collapsed
     private fun hideCompletedTasksOnToolBar(){
         binding.appBarLayout.addOnOffsetChangedListener { _, verticalOffset ->
             run {
@@ -168,6 +167,8 @@ class StartFragment : Fragment() {
         }
     }
 
+    // Destructor
+    // - clear binding;
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

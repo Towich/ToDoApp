@@ -1,6 +1,6 @@
 package com.example.todoapp.data.model
 
-import com.example.todoapp.data.db.TaskEntity
+import com.example.todoapp.data.database.TaskEntity
 
 data class TodoItem(
     var id: Int,

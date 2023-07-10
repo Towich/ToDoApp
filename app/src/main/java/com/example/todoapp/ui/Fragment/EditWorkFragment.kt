@@ -20,7 +20,7 @@ import com.example.todoapp.databinding.FragmentEditWorkBinding
 import com.example.todoapp.ui.ViewModel.StartViewModel
 
 /**
- * A simple [Fragment] subclass as the second destination in the navigation.
+ * A fragment which shows creating new or editing existing task.
  */
 class EditWorkFragment : Fragment() {
 
@@ -94,19 +94,6 @@ class EditWorkFragment : Fragment() {
         highImportanceItem.title = spannable
 
         popupMenu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { menuItem: MenuItem? ->
-
-//            when(menuItem!!.itemId){
-//                R.id.menu_importance_no -> {
-//                    Toast.makeText(context, "menu_importance_no", Toast.LENGTH_SHORT).show()
-//                }
-//                R.id.menu_importance_low -> {
-//                    Toast.makeText(context, "menu_importance_low", Toast.LENGTH_SHORT).show()
-//                }
-//                R.id.menu_importance_high -> {
-//                    Toast.makeText(context, "menu_importance_high", Toast.LENGTH_SHORT).show()
-//                }
-//            }
-
             binding.textImportanceBody.text = menuItem?.title
 
             if(menuItem!!.itemId == R.id.menu_importance_high)
@@ -203,12 +190,6 @@ class EditWorkFragment : Fragment() {
 
             return // button will haven't onClickListener
         }
-
-        // If we editing an existing task
-//        binding.buttonDeleteEditWork.setOnClickListener {
-//            startViewModel.getCurrModel()?.let { it1 -> startViewModel.removeWork(it1) }
-//            mPopBackStack()
-//        }
     }
 
     private fun mPopBackStack(){
