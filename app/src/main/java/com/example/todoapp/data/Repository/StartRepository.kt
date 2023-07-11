@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DiffUtil
 import com.example.todoapp.data.database.TaskDao
 import com.example.todoapp.data.database.TaskEntity
+import com.example.todoapp.data.di.ApplicationScope
 import com.example.todoapp.data.model.TodoItem
 import com.example.todoapp.ui.Adapter.CustomRecyclerAdapter
 import com.example.todoapp.ui.Adapter.UsersDiffCallback
@@ -14,11 +15,14 @@ import kotlinx.coroutines.withContext
 import java.util.Calendar
 import javax.inject.Inject
 
+@ApplicationScope
 class StartRepository @Inject constructor(private val taskDao: TaskDao) {
 
     private var tasks: List<TodoItem> = listOf()
+    private var currModel: TodoItem? = null
+    private var isCurrEditing: Boolean? = null // Is current editing or creating a new work
 
-    val MONTHS = arrayOf(
+    val months = arrayOf(
         "января",
         "февраля",
         "марта",
@@ -35,10 +39,6 @@ class StartRepository @Inject constructor(private val taskDao: TaskDao) {
 
     private val mAdapter = CustomRecyclerAdapter(mutableListOf())
     var completedTasks: MutableLiveData<Int> = MutableLiveData()
-
-    init {
-
-    }
 
     fun addTask(todoItem: TodoItem) = runBlocking {
         launch {
@@ -77,7 +77,7 @@ class StartRepository @Inject constructor(private val taskDao: TaskDao) {
         return@withContext newList
     }
 
-    suspend fun transformTasks(isGetUncompletedTasks: Boolean): List<TodoItem> =
+    private suspend fun transformTasks(isGetUncompletedTasks: Boolean): List<TodoItem> =
         withContext(Dispatchers.IO) {
             val newList = mutableListOf<TodoItem>()
 
@@ -108,21 +108,6 @@ class StartRepository @Inject constructor(private val taskDao: TaskDao) {
         tasks = newWorks
         mAdapter.setTasks(newWorks)
         diffResult.dispatchUpdatesTo(mAdapter)
-    }
-
-    fun removeTaskFromAdapter(todoItem: TodoItem){
-        val newList = mAdapter.getTasks().toMutableList()
-
-//        for (index in mAdapter.getTasks().indices) {
-//            if (mAdapter.getTasks()[index].id == todoItem.id) {
-//                continue
-//            } else {
-//                newList.add(mAdapter.getTasks()[index])
-//            }
-//        }
-
-
-        mAdapter.setTasks(newList.minus(todoItem))
     }
 
     suspend fun updateTask(todoItem: TodoItem) {
@@ -163,9 +148,6 @@ class StartRepository @Inject constructor(private val taskDao: TaskDao) {
 
     fun getAdapter(): CustomRecyclerAdapter = mAdapter
 
-    fun getTask(index: Int) = mAdapter.getTasks()[index]
-
-
     fun setAllTasks(brandNewList: List<TodoItem>) {
 
         val diffCallback = UsersDiffCallback(mAdapter.getTasks(), brandNewList)
@@ -173,5 +155,24 @@ class StartRepository @Inject constructor(private val taskDao: TaskDao) {
 
         mAdapter.setTasks(brandNewList)
         diffResult.dispatchUpdatesTo(mAdapter)
+    }
+
+    // Current model
+    fun setCurrModel(newModel: TodoItem){
+        currModel = newModel
+    }
+    fun clearCurrModel(){
+        currModel = null
+    }
+    fun getCurrModel() = currModel
+
+    // isCurrentEditing
+
+    fun setCurrEditing(newState: Boolean){
+        isCurrEditing = newState
+    }
+    fun isCurrEditing() = isCurrEditing
+    fun clearCurrEditing(){
+        isCurrEditing = null
     }
 }

@@ -8,6 +8,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.R
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 
+/**
+ * Class, which define swipes on RecyclerView's items.
+ */
 abstract class SwipeGesture(context: Context): ItemTouchHelper.SimpleCallback(
     0,
     ItemTouchHelper.LEFT

@@ -5,6 +5,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import com.example.todoapp.databinding.ActivityMainBinding
 
+/**
+ * Main, Single Activity.
+ */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding

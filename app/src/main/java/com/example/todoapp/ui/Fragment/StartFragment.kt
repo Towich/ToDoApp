@@ -6,12 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.todoapp.App
 import com.example.todoapp.R
 import com.example.todoapp.data.model.TodoItem
 import com.example.todoapp.ui.Adapter.CustomRecyclerAdapter
@@ -19,6 +20,7 @@ import com.example.todoapp.databinding.FragmentStartBinding
 import com.example.todoapp.ui.ViewModel.StartViewModel
 import com.example.todoapp.ui.gesture.SwipeGesture
 import java.lang.Exception
+import javax.inject.Inject
 
 /**
  * A fragment which shows and controls the list of tasks.
@@ -27,8 +29,11 @@ class StartFragment : Fragment() {
 
     private var _binding: FragmentStartBinding? = null
 
-    // Shared ViewModel
-    private val viewModel: StartViewModel by activityViewModels()
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    // ViewModel
+    private lateinit var viewModel: StartViewModel
     private lateinit var recyclerView: RecyclerView
 
     // This property is only valid between onCreateView and
@@ -46,6 +51,9 @@ class StartFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        (requireContext().applicationContext as App).appComponent.startComponent().create().inject(this)
+
+        viewModel = ViewModelProvider(this, viewModelFactory).get(StartViewModel::class.java)
 
         // Connecting RecyclerView
         recyclerView = binding.recyclerView
@@ -55,7 +63,7 @@ class StartFragment : Fragment() {
         val mAdapter = viewModel.getAdapter()
         recyclerView.adapter = mAdapter
 
-        viewModel.setupQuantityOfCompletedTasks()
+        viewModel.getQuantityOfCompletedTasks()
 
         // onClick CheckBox on todoItem
         mAdapter.setOnClickListenerCheckBoxButton(object: CustomRecyclerAdapter.OnClickListener {

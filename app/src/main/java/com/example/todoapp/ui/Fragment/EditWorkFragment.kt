@@ -13,11 +13,15 @@ import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
+import com.example.todoapp.App
 import com.example.todoapp.R
 import com.example.todoapp.data.model.TodoItem
 import com.example.todoapp.databinding.FragmentEditWorkBinding
+import com.example.todoapp.ui.ViewModel.EditTaskViewModel
 import com.example.todoapp.ui.ViewModel.StartViewModel
+import javax.inject.Inject
 
 /**
  * A fragment which shows creating new or editing existing task.
@@ -26,7 +30,14 @@ class EditWorkFragment : Fragment() {
 
 
     private var _binding: FragmentEditWorkBinding? = null
-    private val startViewModel: StartViewModel by activityViewModels()
+
+    // ViewModel Factory
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    // ViewModel
+    private lateinit var viewModel: EditTaskViewModel
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -44,32 +55,39 @@ class EditWorkFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Inject
+        (requireContext().applicationContext as App).appComponent.startComponent().create().inject(this)
+
+        // Initialize ViewModel
+        viewModel = ViewModelProvider(this, viewModelFactory).get(EditTaskViewModel::class.java)
+
+        // onClick on "Close"
         binding.imagebuttonClose.setOnClickListener {
             mPopBackStack()
         }
 
+        // onClick on choosing "Importance"
         val buttonShowImportancePopupMenu = binding.textImportanceTitle
-
         binding.textImportanceTitle.setOnClickListener {
             showImportancePopupMenu(buttonShowImportancePopupMenu)
         }
 
+        // onClick on "Deadline"
         binding.buttonSetDeadline.isEnabled = false
         binding.buttonSetDeadline.setOnClickListener {
             showDateDialog()
         }
 
+        // onClick on switcher of "Deadline"
         binding.switcherDeadline.setOnClickListener {
             if(binding.switcherDeadline.isChecked){
                 binding.buttonSetDeadline.isEnabled = true
-                Toast.makeText(context, "NOW ENABLED!", Toast.LENGTH_SHORT).show()
                 showDateDialog()
             }
             else{
                 binding.buttonSetDeadline.isEnabled = false
                 binding.textViewSelectedDeadline.text = ""
-                startViewModel.clearDeadline()
-                Toast.makeText(context, "NOW DISABLED!", Toast.LENGTH_SHORT).show()
+                viewModel.clearDeadline()
             }
         }
 
@@ -80,11 +98,14 @@ class EditWorkFragment : Fragment() {
 
     // Show Popup menu with choosing importance
     private fun showImportancePopupMenu(v: View){
+
+        // Create an instance of PopupMenu
         val popupMenu = PopupMenu(context, v)
         popupMenu.menuInflater.inflate(R.menu.menu_importance, popupMenu.menu)
 
-        var highImportanceItem = popupMenu.menu.getItem(2)
-        var spannable: SpannableString = SpannableString(highImportanceItem.title.toString())
+        // Change color of importance "High" to RED
+        val highImportanceItem = popupMenu.menu.getItem(2)
+        val spannable = SpannableString(highImportanceItem.title.toString())
         spannable.setSpan(ForegroundColorSpan(
             ContextCompat.getColor(v.context, R.color.red)),
             0,
@@ -93,9 +114,12 @@ class EditWorkFragment : Fragment() {
         )
         highImportanceItem.title = spannable
 
+        // onClick on menu item "Importance"
         popupMenu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { menuItem: MenuItem? ->
             binding.textImportanceBody.text = menuItem?.title
 
+            // If importance = "High" --> change color to Red
+            // else --> to Gray
             if(menuItem!!.itemId == R.id.menu_importance_high)
                 binding.textImportanceBody.setTextColor(ContextCompat.getColor(v.context, R.color.red))
             else
@@ -108,7 +132,7 @@ class EditWorkFragment : Fragment() {
 
     // Set text in EditText and chosen importance by current TodoItem
     private fun loadEditingModel(){
-        val todoItem = startViewModel.getCurrModel() ?: return
+        val todoItem = viewModel.getCurrModel() ?: return
 
         // Load Text of task
         binding.editText.setText(todoItem.textCase)
@@ -141,21 +165,22 @@ class EditWorkFragment : Fragment() {
 
             var importance = binding.textImportanceBody.text.toString()
 
+            // If String has "!!" in prefix, remove it
             if(importance.equals("!!Высокий"))
                 importance = importance.drop(2)
 
 
-            // edit existing work
-            if(startViewModel.isCurrEditing() == true){
-                val currModel = startViewModel.getCurrModel() ?: return@setOnClickListener
+            // If editing existing work
+            if(viewModel.isCurrEditing() == true){
+                val currModel = viewModel.getCurrModel() ?: return@setOnClickListener
                 currModel.textCase = binding.editText.text.toString()
                 currModel.importance = importance
                 currModel.deadlineData = binding.textViewSelectedDeadline.text.toString()
 
-                startViewModel.updateTask(currModel)
-                startViewModel.updateTaskInAdapter(currModel)
+                viewModel.updateTask(currModel)
+                viewModel.updateTaskInAdapter(currModel)
             }
-            else{ // create a new work
+            else{ // If creating a new work
                 val newWork = TodoItem(
                     0,
                     binding.editText.text.toString(),
@@ -164,8 +189,8 @@ class EditWorkFragment : Fragment() {
                     false
                 )
                 Toast.makeText(context, newWork.toString(), Toast.LENGTH_SHORT).show()
-                startViewModel.addTask(newWork)
-                startViewModel.increaseCompletedTasks(1)
+                viewModel.addTask(newWork)
+                viewModel.increaseCompletedTasks(1)
             }
 
             mPopBackStack()
@@ -177,7 +202,7 @@ class EditWorkFragment : Fragment() {
     private fun connectButtonDelete(){
 
         // If we creating a new task
-        if(startViewModel.isCurrEditing() == false){
+        if(viewModel.isCurrEditing() == false){
 
             // Set Image's and Text's color to GRAY_26
             binding.imageViewDeleteEditWork.setImageResource(R.drawable.delete_gray)
@@ -190,22 +215,31 @@ class EditWorkFragment : Fragment() {
 
             return // button will haven't onClickListener
         }
+
+        binding.buttonDeleteEditWork.setOnClickListener {
+            val currTodoItem = viewModel.getCurrModel()
+            viewModel.removeTask(currTodoItem!!)
+            mPopBackStack()
+        }
     }
 
+    // Navigate to back in stack Fragment
     private fun mPopBackStack(){
         view?.findNavController()?.navigateUp()
     }
 
+    // Show dialog with choosing date
     private fun showDateDialog(){
 
-        val currentDate = startViewModel.getCurrentDate()
+        val currentDate = viewModel.getCurrentDate()
 
+        // Create an instance of DatePickerDialog
         val dpd = DatePickerDialog(
             this@EditWorkFragment.requireContext(),
             DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
 
                 // Selected Date
-                val deadLineString = "" + dayOfMonth + " " + startViewModel.getMonthByIndex(monthOfYear) + ", " + year
+                val deadLineString = "" + dayOfMonth + " " + viewModel.getMonthByIndex(monthOfYear) + ", " + year
 
                 // Display Selected Date in textbox
                 binding.textViewSelectedDeadline.text = deadLineString
@@ -217,8 +251,8 @@ class EditWorkFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        startViewModel.clearCurrModel()
-        startViewModel.clearCurrEditing()
+        viewModel.clearCurrModel()
+        viewModel.clearCurrEditing()
         _binding = null
     }
 }

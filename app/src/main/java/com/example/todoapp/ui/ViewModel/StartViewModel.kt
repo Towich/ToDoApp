@@ -1,38 +1,23 @@
 package com.example.todoapp.ui.ViewModel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
-import com.example.todoapp.App
+import androidx.lifecycle.*
 import com.example.todoapp.data.Repository.StartRepository
 import com.example.todoapp.data.model.TodoItem
 import com.example.todoapp.ui.Adapter.CustomRecyclerAdapter
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class StartViewModel(application: Application) : AndroidViewModel(application) {
+class StartViewModel @Inject constructor(
+    var repository: StartRepository
+) : ViewModel() {
 
-    @Inject
-    lateinit var repository: StartRepository
-
-    private var currModel: TodoItem? = null
-    private var isCurrEditing: Boolean? = null // Is current editing or creating a new work
-
-    var completedTasks: MutableLiveData<Int>
+    var completedTasks: MutableLiveData<Int> = repository.completedTasks
     var showingUncompletedTasks: Boolean = false
 
-    init {
-        // Injecting this ViewModel
-        (application as App).appComponent.inject(this)
-        completedTasks = repository.completedTasks
-    }
-
     // Tasks
-    fun addTask(todoItem: TodoItem){
-        repository.addTask(todoItem)
-    }
 
+    // Get all tasks from Room
+    // and setup into RecyclerView's Adapter
     fun setupTasks() {
         viewModelScope.launch {
             val tasksList = repository.getTasks()
@@ -40,69 +25,54 @@ class StartViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    // Get all uncompleted tasks from Room
+    // and setup into RecyclerView's Adapter
     fun setupUncompletedTasks(){
         viewModelScope.launch {
             val tasksList = repository.getAllUncompletedTasks()
-
             repository.setAllTasks(tasksList)
         }
-
     }
 
-    fun setupQuantityOfCompletedTasks(){
+    // Get count of completed tasks
+    fun getQuantityOfCompletedTasks(){
         viewModelScope.launch {
             val tasksList = repository.getAllCompletedTasks()
-
             completedTasks.value = tasksList.size
         }
     }
 
+    // Remove task from Room
     fun removeTask(todoItem: TodoItem){
         viewModelScope.launch {
             repository.removeWork(todoItem)
         }
     }
+
+    // Update task in Room
     fun updateTask(todoItem: TodoItem){
         viewModelScope.launch {
             repository.updateTask(todoItem)
         }
     }
 
+    // Update task in Adapter
     fun updateTaskInAdapter(todoItem: TodoItem){
         repository.updateTaskInAdapter(todoItem)
     }
 
-    // Current model
+    // Set current model for editing in EditWorkFragment
     fun setCurrModel(newModel: TodoItem){
-        currModel = newModel
+        repository.setCurrModel(newModel)
     }
-    fun clearCurrModel(){
-        currModel = null
-    }
-    fun getCurrModel() = currModel
 
-    // isCurrentEditing
-
+    // Set current editing flag for editing in EditWorkFragment
     fun setCurrEditing(newState: Boolean){
-        isCurrEditing = newState
+        repository.setCurrEditing(newState)
     }
-    fun isCurrEditing() = isCurrEditing
-    fun clearCurrEditing(){
-        isCurrEditing = null
-    }
-    fun getMonthByIndex(index: Int): String{
-        return repository.MONTHS[index]
-    }
-    fun clearDeadline(){
-        currModel?.deadlineData = ""
-    }
-
-    fun getCurrentDate(): List<Int> {
-        return repository.getCurrentDate()
-    }
-
     fun getAdapter(): CustomRecyclerAdapter = repository.getAdapter()
 
+    // Increase/decrease counter of completed tasks
     fun increaseCompletedTasks(delta: Int){
         completedTasks.value = completedTasks.value?.plus(delta)
     }

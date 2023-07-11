@@ -1,13 +1,13 @@
 package com.example.todoapp.data.di
 
 import android.content.Context
-import com.example.todoapp.ui.ViewModel.StartViewModel
 import dagger.BindsInstance
 import dagger.Component
 
 /**
  * Main Component of Application.
  */
+@ApplicationScope
 @Component(modules = [StorageModule::class])
 interface AppComponent {
 
@@ -18,5 +18,5 @@ interface AppComponent {
     }
 
     // Classes that be injected by this Component
-    fun inject(viewModel: StartViewModel)
+    fun startComponent(): FragmentComponent.Factory
 }
