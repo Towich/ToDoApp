@@ -51,8 +51,11 @@ class StartFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Inject
         (requireContext().applicationContext as App).appComponent.startComponent().create().inject(this)
 
+        // Instantiate ViewModel
         viewModel = ViewModelProvider(this, viewModelFactory).get(StartViewModel::class.java)
 
         // Connecting RecyclerView
@@ -63,6 +66,7 @@ class StartFragment : Fragment() {
         val mAdapter = viewModel.getAdapter()
         recyclerView.adapter = mAdapter
 
+        // Setup counter of already completed tasks
         viewModel.getQuantityOfCompletedTasks()
 
         // onClick CheckBox on todoItem

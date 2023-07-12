@@ -1,22 +1,31 @@
 package com.example.todoapp.data.Repository
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DiffUtil
 import com.example.todoapp.data.database.TaskDao
 import com.example.todoapp.data.database.TaskEntity
 import com.example.todoapp.data.di.ApplicationScope
 import com.example.todoapp.data.model.TodoItem
+import com.example.todoapp.data.network.ApiService
+import com.example.todoapp.data.network.FileReader
 import com.example.todoapp.ui.Adapter.CustomRecyclerAdapter
 import com.example.todoapp.ui.Adapter.UsersDiffCallback
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
 import java.util.Calendar
 import javax.inject.Inject
 
 @ApplicationScope
-class StartRepository @Inject constructor(private val taskDao: TaskDao) {
+class StartRepository @Inject constructor(
+    private val taskDao: TaskDao,
+    private val apiService: ApiService,
+    private val fileReader: FileReader
+    ) {
 
     private var tasks: List<TodoItem> = listOf()
     private var currModel: TodoItem? = null
@@ -36,6 +45,22 @@ class StartRepository @Inject constructor(private val taskDao: TaskDao) {
         "ноября",
         "декабря"
     )
+
+    init {
+        runBlocking {
+            withContext(Dispatchers.IO){
+                val mockWebServer = MockWebServer()
+                mockWebServer.enqueue(MockResponse().setBody(fileReader.readStringFromFile("success_response_1.json")))
+                mockWebServer.start()
+
+                val myUrl = mockWebServer.url("/v1/")
+                Log.i("mRepository", myUrl.toString())
+
+                apiService.getRequest(myUrl.toString())
+            }
+        }
+
+    }
 
     private val mAdapter = CustomRecyclerAdapter(mutableListOf())
     var completedTasks: MutableLiveData<Int> = MutableLiveData()
