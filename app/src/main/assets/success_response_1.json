@@ -1,6 +1,6 @@
 {
   "id": 999,
-  "textCase": "Сделать OkHTTP3",
+  "textCase": "Сделать MockWebServer",
   "importance": "Высокий",
   "deadlineData": "12 июля, 2023",
   "completed": false

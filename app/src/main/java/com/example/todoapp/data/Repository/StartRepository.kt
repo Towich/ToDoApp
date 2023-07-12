@@ -1,5 +1,7 @@
 package com.example.todoapp.data.Repository
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DiffUtil
@@ -9,8 +11,10 @@ import com.example.todoapp.data.di.ApplicationScope
 import com.example.todoapp.data.model.TodoItem
 import com.example.todoapp.data.network.ApiService
 import com.example.todoapp.data.network.FileReader
+import com.example.todoapp.data.network.RequestCallback
 import com.example.todoapp.ui.Adapter.CustomRecyclerAdapter
 import com.example.todoapp.ui.Adapter.UsersDiffCallback
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -18,6 +22,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import java.util.Calendar
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @ApplicationScope
@@ -25,7 +30,7 @@ class StartRepository @Inject constructor(
     private val taskDao: TaskDao,
     private val apiService: ApiService,
     private val fileReader: FileReader
-    ) {
+) {
 
     private var tasks: List<TodoItem> = listOf()
     private var currModel: TodoItem? = null
@@ -47,18 +52,6 @@ class StartRepository @Inject constructor(
     )
 
     init {
-        runBlocking {
-            withContext(Dispatchers.IO){
-                val mockWebServer = MockWebServer()
-                mockWebServer.enqueue(MockResponse().setBody(fileReader.readStringFromFile("success_response_1.json")))
-                mockWebServer.start()
-
-                val myUrl = mockWebServer.url("/v1/")
-                Log.i("mRepository", myUrl.toString())
-
-                apiService.getRequest(myUrl.toString())
-            }
-        }
 
     }
 
@@ -71,19 +64,18 @@ class StartRepository @Inject constructor(
                 taskDao.insertTask(todoItem.toEntity())
                 getTasks()
             }
-
-//            val diffCallback = UsersDiffCallback(tasks, newList)
-//            val diffResult = DiffUtil.calculateDiff(diffCallback)
-
-//            mAdapter.setTasks(newList)
-//            diffResult.dispatchUpdatesTo(mAdapter)
-//            mAdapter.notifyItemInserted(tasks.size)
         }
+
+        Handler(Looper.getMainLooper()).post {
+            getAdapter().notifyItemInserted(mAdapter.getTasks().size)
+        }
+
 
     }
 
     suspend fun getTasks(): List<TodoItem> {
         tasks = transformTasks(false)
+        mAdapter.setTasks(tasks)
         return tasks
     }
 
@@ -115,6 +107,7 @@ class StartRepository @Inject constructor(
             for (e in dbList) {
                 newList.add(e.toModel())
             }
+
             return@withContext newList
         }
 
@@ -183,21 +176,55 @@ class StartRepository @Inject constructor(
     }
 
     // Current model
-    fun setCurrModel(newModel: TodoItem){
+    fun setCurrModel(newModel: TodoItem) {
         currModel = newModel
     }
-    fun clearCurrModel(){
+
+    fun clearCurrModel() {
         currModel = null
     }
+
     fun getCurrModel() = currModel
 
     // isCurrentEditing
 
-    fun setCurrEditing(newState: Boolean){
+    fun setCurrEditing(newState: Boolean) {
         isCurrEditing = newState
     }
+
     fun isCurrEditing() = isCurrEditing
-    fun clearCurrEditing(){
+    fun clearCurrEditing() {
         isCurrEditing = null
+    }
+
+    suspend fun testMockWebServer(callback: RequestCallback) {
+        withContext(Dispatchers.IO) {
+            val mockWebServer = MockWebServer()
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setBody(fileReader.readStringFromFile("success_response_1.json"))
+                    .setResponseCode(200)
+                    .setBodyDelay(2, TimeUnit.SECONDS)
+            )
+            mockWebServer.start()
+
+            val myUrl = mockWebServer.url("/v1/")
+
+            val oldList = tasks.toList()
+            apiService.getRequest(myUrl.toString(), object : RequestCallback {
+                override fun onSuccess(response: String) {
+                    val todoItem = Gson().fromJson(response, TodoItem::class.java)
+                    addTask(todoItem)
+
+                    callback.onSuccess("success")
+                }
+
+                override fun onFailure(error: String) {
+                    // TODO: implement this
+                    callback.onFailure("error")
+                }
+
+            })
+        }
     }
 }

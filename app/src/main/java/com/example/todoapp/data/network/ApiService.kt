@@ -21,7 +21,7 @@ class ApiService @Inject constructor(
     ) {
 
     // @GET request
-    fun getRequest(url: String){
+    fun getRequest(url: String, callback: RequestCallback){
         val request = Request.Builder()
             .url(url)
             .build()
@@ -37,18 +37,15 @@ class ApiService @Inject constructor(
                         throw IOException("Запрос к серверу не был успешен:" +
                                 " ${response.code} ${response.message}")
                     }
-//                    callback.onSuccess(response.body!!.string())
-                    // пример получения всех заголовков ответа
-//                    for ((name, value) in response.headers) {
-//                        Log.i("mApiService","$name: $value")
-//                    }
+
                     // вывод тела ответа
                     val responseString = response.body!!.string()
-                    val receivedTodoItem = Gson().fromJson(responseString, TodoItem::class.java)
+//                    val receivedTodoItem = Gson().fromJson(responseString, TodoItem::class.java)
                     Log.i("mApiService", responseString)
-                    Log.i("mApiService_2", receivedTodoItem.id.toString())
-                    Log.i("mApiService_2", receivedTodoItem.textCase)
-                    Log.i("mApiService_2", receivedTodoItem.deadlineData)
+//                    Log.i("mApiService_2", receivedTodoItem.id.toString())
+//                    Log.i("mApiService_2", receivedTodoItem.textCase)
+//                    Log.i("mApiService_2", receivedTodoItem.deadlineData)
+                    callback.onSuccess(responseString)
                 }
             }
         })

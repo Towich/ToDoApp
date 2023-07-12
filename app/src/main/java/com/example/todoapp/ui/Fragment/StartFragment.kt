@@ -111,6 +111,9 @@ class StartFragment : Fragment() {
                 viewModel.setupTasks()
                 binding.imageButtonShowCompletedTasks.setImageResource(R.drawable.visibility_off)
             }
+
+            // TODO: REMOVE
+            viewModel.testMockWebServer()
         }
 
         // LiveData with count of completed tasks

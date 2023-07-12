@@ -1,14 +1,22 @@
 package com.example.todoapp.ui.ViewModel
 
+import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.*
 import com.example.todoapp.data.Repository.StartRepository
 import com.example.todoapp.data.model.TodoItem
+import com.example.todoapp.data.network.RequestCallback
 import com.example.todoapp.ui.Adapter.CustomRecyclerAdapter
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class StartViewModel @Inject constructor(
-    var repository: StartRepository
+    var repository: StartRepository,
+    var applicationContext: Context
 ) : ViewModel() {
 
     var completedTasks: MutableLiveData<Int> = repository.completedTasks
@@ -21,7 +29,7 @@ class StartViewModel @Inject constructor(
     fun setupTasks() {
         viewModelScope.launch {
             val tasksList = repository.getTasks()
-            repository.setAllTasks(tasksList)
+            repository.getAdapter().notifyDataSetChanged()
         }
     }
 
@@ -77,4 +85,22 @@ class StartViewModel @Inject constructor(
         completedTasks.value = completedTasks.value?.plus(delta)
     }
 
+    fun testMockWebServer(){
+
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.testMockWebServer(object: RequestCallback {
+                override fun onSuccess(response: String) {
+                    Handler(Looper.getMainLooper()).post {
+                        Toast.makeText(applicationContext, "SUCCESS", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(error: String) {
+                    Handler(Looper.getMainLooper()).post {
+                        Toast.makeText(applicationContext, "ERROR", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            })
+        }
+    }
 }
