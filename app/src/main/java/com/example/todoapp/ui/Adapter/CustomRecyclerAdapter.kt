@@ -1,18 +1,17 @@
 package com.example.todoapp.ui.Adapter
 
 import android.graphics.Paint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
-import android.widget.CompoundButton
-import android.widget.ImageButton
+import android.widget.*
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.MutableLiveData
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.R
 import com.example.todoapp.data.model.TodoItem
+
 
 class CustomRecyclerAdapter(private var tasks: List<TodoItem>)
     : RecyclerView.Adapter<CustomRecyclerAdapter.MyViewHolder>() {
@@ -23,6 +22,7 @@ class CustomRecyclerAdapter(private var tasks: List<TodoItem>)
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val checkBox: CheckBox = itemView.findViewById(R.id.checkbox)
         val buttonInfo: ImageButton = itemView.findViewById(R.id.button_info)
+        val textDeadlineDate: TextView = itemView.findViewById(R.id.text_view_deadline_date)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -37,10 +37,27 @@ class CustomRecyclerAdapter(private var tasks: List<TodoItem>)
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
 
-        val todoItem: TodoItem = tasks.get(position) ?: return
+        val todoItem: TodoItem = tasks[position]
 
         holder.checkBox.text = todoItem.textCase
         holder.checkBox.isChecked = todoItem.completed
+
+        // Add TextView with deadline date to holder
+        if(todoItem.deadlineData != ""){
+            holder.textDeadlineDate.visibility = View.VISIBLE
+            holder.textDeadlineDate.text = todoItem.deadlineData.dropLast(6)
+//            val params = ConstraintLayout.LayoutParams(
+//                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+//                ConstraintLayout.LayoutParams.WRAP_CONTENT
+//            )
+
+//            val textView = TextView(holder.constraintLayout.context.applicationContext)
+//            textView.id = View.generateViewId()
+//            textView.layoutParams = params
+//            textView.text = todoItem.deadlineData
+//            textView.textSize = R.dimen.subhead.toFloat()
+//            holder.constraintLayout.addView(textView)
+        }
 
         val importance: Boolean = todoItem.importance == "Высокий"
 

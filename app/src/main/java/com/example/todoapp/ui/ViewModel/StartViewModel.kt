@@ -86,7 +86,6 @@ class StartViewModel @Inject constructor(
     }
 
     fun testMockWebServer(){
-
         viewModelScope.launch(Dispatchers.IO) {
             repository.testMockWebServer(object: RequestCallback {
                 override fun onSuccess(response: String) {
