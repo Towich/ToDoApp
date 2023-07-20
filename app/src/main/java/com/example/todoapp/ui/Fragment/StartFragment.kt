@@ -99,6 +99,11 @@ class StartFragment : Fragment() {
             viewModel.setCurrEditing(false)
         }
 
+        if(viewModel.showingUncompletedTasks)
+            binding.imageButtonShowCompletedTasks.setImageResource(R.drawable.visibility)
+        else
+            binding.imageButtonShowCompletedTasks.setImageResource(R.drawable.visibility_off)
+
         // onClick "Eye" - hide completed tasks
         binding.imageButtonShowCompletedTasks.setOnClickListener {
             viewModel.showingUncompletedTasks = !viewModel.showingUncompletedTasks
@@ -113,7 +118,7 @@ class StartFragment : Fragment() {
             }
 
             // TODO: REMOVE
-            viewModel.testMockWebServer()
+            // viewModel.testMockWebServer()
         }
 
         // LiveData with count of completed tasks

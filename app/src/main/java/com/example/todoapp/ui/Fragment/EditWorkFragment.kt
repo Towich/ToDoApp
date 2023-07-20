@@ -87,7 +87,6 @@ class EditWorkFragment : Fragment() {
             else{
                 binding.buttonSetDeadline.isEnabled = false
                 binding.textViewSelectedDeadline.text = ""
-                viewModel.clearDeadline()
             }
         }
 

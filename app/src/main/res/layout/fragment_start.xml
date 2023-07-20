@@ -17,13 +17,10 @@
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/black_16"
             app:expandedTitleMarginBottom="60dp"
             app:expandedTitleMarginStart="60dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:title="Мои дела"
-            app:collapsedTitleTextColor="@color/white"
-            app:expandedTitleTextColor="@color/white">
+            app:title="Мои дела">
 
             <!-- TODO: This button isn't pressing while collapsed -->
             <ImageButton
@@ -45,8 +42,8 @@
                 android:layout_marginStart="60dp"
                 android:layout_marginBottom="18dp"
                 android:text="Выполнено - %null%"
-                android:textColor="@color/gray_66"
                 android:textSize="@dimen/title"
+                android:textColor="@color/H2_color"
                 android:layout_gravity="bottom"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
@@ -74,14 +71,16 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/rounded_border"
-        android:backgroundTint="@color/black_25"
+        android:backgroundTint="?attr/colorAccent"
         android:minHeight="150dp"
         android:paddingTop="8dp"
+        android:paddingBottom="70dp"
+        android:clipToPadding="false"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2"
-        tools:itemCount="6"
+        tools:itemCount="3"
         tools:listitem="@layout/work_item" />
 
 

@@ -2,11 +2,17 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.ToDoApp" parent="Theme.AppCompat.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <item name="background">@color/black_16</item>
-        <item name="android:navigationBarColor">@color/black_16</item>
-        <item name="android:windowBackground">@color/black_16</item>
-        <item name="colorSecondary">@color/black_16</item>
-        <item name="colorPrimaryDark">@color/black_16</item>
+        <item name="colorPrimary">@color/white_F7</item>
+        <item name="colorSecondary">@color/black_25</item>
+        <item name="colorAccent">@color/white</item>
+
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <item name="android:windowLightStatusBar">true</item>
+
+        <item name="background">@color/white_F7</item>
+        <item name="android:navigationBarColor">@color/white_F7</item>
+        <item name="android:windowBackground">@color/white_F7</item>
+
         <item name="floatingActionButtonStyle">@style/FloatingActionButtonStyle</item>
     </style>
 

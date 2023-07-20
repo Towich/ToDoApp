@@ -1,20 +1,21 @@
 package com.example.todoapp.ui.Adapter
 
 import android.graphics.Paint
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
-import androidx.constraintlayout.widget.ConstraintLayout
+import android.widget.CheckBox
+import android.widget.CompoundButton
+import android.widget.ImageButton
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.R
 import com.example.todoapp.data.model.TodoItem
 
 
-class CustomRecyclerAdapter(private var tasks: List<TodoItem>)
-    : RecyclerView.Adapter<CustomRecyclerAdapter.MyViewHolder>() {
+class CustomRecyclerAdapter(private var tasks: List<TodoItem>) :
+    RecyclerView.Adapter<CustomRecyclerAdapter.MyViewHolder>() {
 
     private var onClickListenerCheckBoxButton: OnClickListener? = null
     private var onClickListenerInfoButton: OnClickListener? = null
@@ -43,33 +44,22 @@ class CustomRecyclerAdapter(private var tasks: List<TodoItem>)
         holder.checkBox.isChecked = todoItem.completed
 
         // Add TextView with deadline date to holder
-        if(todoItem.deadlineData != ""){
+        if (todoItem.deadlineData != "") {
             holder.textDeadlineDate.visibility = View.VISIBLE
             holder.textDeadlineDate.text = todoItem.deadlineData.dropLast(6)
-//            val params = ConstraintLayout.LayoutParams(
-//                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-//                ConstraintLayout.LayoutParams.WRAP_CONTENT
-//            )
-
-//            val textView = TextView(holder.constraintLayout.context.applicationContext)
-//            textView.id = View.generateViewId()
-//            textView.layoutParams = params
-//            textView.text = todoItem.deadlineData
-//            textView.textSize = R.dimen.subhead.toFloat()
-//            holder.constraintLayout.addView(textView)
         }
 
         val importance: Boolean = todoItem.importance == "Высокий"
 
-        updateStatusOfWork(holder.checkBox, todoItem.completed, importance)
+        updateStatusOfWork(holder.checkBox, holder.textDeadlineDate , todoItem.completed, importance)
 
         // Click on CheckBox
         holder.checkBox.setOnClickListener {
             run {
-                updateStatusOfWork(holder.checkBox, !todoItem.completed, importance)
+                updateStatusOfWork(holder.checkBox, holder.textDeadlineDate, !todoItem.completed, importance)
                 todoItem.completed = !todoItem.completed
 
-                if(onClickListenerCheckBoxButton != null){
+                if (onClickListenerCheckBoxButton != null) {
                     onClickListenerCheckBoxButton!!.onClick(todoItem)
                 }
             }
@@ -84,20 +74,28 @@ class CustomRecyclerAdapter(private var tasks: List<TodoItem>)
     }
 
     // Changing CheckBox by clicking on it
-    private fun updateStatusOfWork(compoundButton: CompoundButton, newStatus: Boolean, isHighImportance: Boolean){
+    private fun updateStatusOfWork(
+        compoundButton: CompoundButton,
+        deadlineTextView: TextView,
+        newStatus: Boolean,
+        isHighImportance: Boolean
+    ) {
 
         // If CHECKED
-        if(newStatus){
+        if (newStatus) {
 
-            // Set "STRIKE_THRU" for CheckBox's Text
+            // Set "STRIKE_THRU" for CheckBox and Deadline Text
             compoundButton.paintFlags =
                 compoundButton.paintFlags.or(Paint.STRIKE_THRU_TEXT_FLAG)
 
-            // Set GRAY color for CheckBox's Text
+            deadlineTextView.paintFlags =
+                    deadlineTextView.paintFlags.or(Paint.STRIKE_THRU_TEXT_FLAG)
+
+            // Set GRAY color for CheckBox Text
             compoundButton.setTextColor(
                 ContextCompat.getColor(
                     compoundButton.context,
-                    R.color.gray_33
+                    R.color.tast_text_color_disabled
                 )
             )
 
@@ -105,20 +103,23 @@ class CustomRecyclerAdapter(private var tasks: List<TodoItem>)
         } // If NOT CHECKED
         else {
 
-            // Remove "STRIKE_THRU" from CheckBox's Text
+            // Remove "STRIKE_THRU" from CheckBox and Deadline Text
             compoundButton.paintFlags =
                 compoundButton.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
 
-            // Set WHITE color for CheckBox's Text
+            deadlineTextView.paintFlags =
+                compoundButton.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+
+            // Set WHITE color for CheckBox Text
             compoundButton.setTextColor(
                 ContextCompat.getColor(
                     compoundButton.context,
-                    R.color.white
+                    R.color.task_text_color
                 )
             )
 
             // If TodoItem has "Высокий" importance
-            if(isHighImportance)
+            if (isHighImportance)
                 compoundButton.setButtonDrawable(R.drawable.unchecked__1_)  // red square
             else
                 compoundButton.setButtonDrawable(R.drawable.unchecked)      // gray square
@@ -129,12 +130,13 @@ class CustomRecyclerAdapter(private var tasks: List<TodoItem>)
     fun setOnClickListenerInfoButton(onClickListener: OnClickListener) {
         this.onClickListenerInfoButton = onClickListener
     }
+
     fun setOnClickListenerCheckBoxButton(onClickListener: OnClickListener) {
         this.onClickListenerCheckBoxButton = onClickListener
     }
 
     fun getTasks(): List<TodoItem> = tasks
-    fun setTasks(tasks: List<TodoItem>){
+    fun setTasks(tasks: List<TodoItem>) {
         this.tasks = tasks
     }
 

@@ -5,7 +5,6 @@
     android:id="@+id/constraint_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/black_25"
     android:paddingStart="10dp">
 
     <CheckBox
@@ -20,9 +19,10 @@
         android:paddingTop="14dp"
         android:paddingEnd="18dp"
         android:paddingBottom="18dp"
-        android:text="Купить что-тоgfd"
-        android:textColor="@color/white"
+        android:layout_marginEnd="67dp"
+        android:text="Купить чтоврgdfgdfgdfgdfgdfgfdhgfhfghпрпа"
         android:textSize="@dimen/title"
+        app:layout_constraintEnd_toStartOf="@+id/button_info"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -39,16 +39,15 @@
 
     <TextView
         android:id="@+id/text_view_deadline_date"
-        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
         android:layout_marginStart="43dp"
-        android:layout_marginTop="45dp"
+        android:layout_marginTop="-15dp"
         android:text="27 июля, 2023"
-        android:textColor="@color/gray_66"
         android:textSize="@dimen/subhead"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textColor="@color/H2_color"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/checkbox" />
+        app:layout_constraintTop_toBottomOf="@+id/checkbox" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

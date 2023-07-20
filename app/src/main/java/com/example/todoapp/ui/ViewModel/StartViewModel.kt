@@ -29,7 +29,8 @@ class StartViewModel @Inject constructor(
     fun setupTasks() {
         viewModelScope.launch {
             val tasksList = repository.getTasks()
-            repository.getAdapter().notifyDataSetChanged()
+//            repository.getAdapter().notifyDataSetChanged()
+            repository.setAllTasks(tasksList)
         }
     }
 

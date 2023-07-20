@@ -75,7 +75,7 @@ class StartRepository @Inject constructor(
 
     suspend fun getTasks(): List<TodoItem> {
         tasks = transformTasks(false)
-        mAdapter.setTasks(tasks)
+//        mAdapter.setTasks(tasks)
         return tasks
     }
 
