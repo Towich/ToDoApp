@@ -22,7 +22,7 @@ class EditTaskViewModel @Inject constructor(
     // Remove task from Room
     fun removeTask(todoItem: TodoItem){
         viewModelScope.launch {
-            repository.removeWork(todoItem)
+            repository.removeTask(todoItem)
         }
     }
 

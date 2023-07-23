@@ -59,7 +59,7 @@ class EditWorkFragment : Fragment() {
         (requireContext().applicationContext as App).appComponent.startComponent().create().inject(this)
 
         // Initialize ViewModel
-        viewModel = ViewModelProvider(this, viewModelFactory).get(EditTaskViewModel::class.java)
+        viewModel = ViewModelProvider(this, viewModelFactory)[EditTaskViewModel::class.java]
 
         // onClick on "Close"
         binding.imagebuttonClose.setOnClickListener {
@@ -235,7 +235,7 @@ class EditWorkFragment : Fragment() {
         // Create an instance of DatePickerDialog
         val dpd = DatePickerDialog(
             this@EditWorkFragment.requireContext(),
-            DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
+            { _, year, monthOfYear, dayOfMonth ->
 
                 // Selected Date
                 val deadLineString = "" + dayOfMonth + " " + viewModel.getMonthByIndex(monthOfYear) + ", " + year

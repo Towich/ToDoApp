@@ -2,7 +2,6 @@ package com.example.todoapp.data.Repository
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DiffUtil
 import com.example.todoapp.data.database.TaskDao
@@ -35,7 +34,8 @@ class StartRepository @Inject constructor(
     private var tasks: List<TodoItem> = listOf()
     private var currModel: TodoItem? = null
     private var isCurrEditing: Boolean? = null // Is current editing or creating a new work
-
+    private val mAdapter = CustomRecyclerAdapter(mutableListOf())
+    var completedTasks: MutableLiveData<Int> = MutableLiveData()
     val months = arrayOf(
         "января",
         "февраля",
@@ -51,13 +51,7 @@ class StartRepository @Inject constructor(
         "декабря"
     )
 
-    init {
-
-    }
-
-    private val mAdapter = CustomRecyclerAdapter(mutableListOf())
-    var completedTasks: MutableLiveData<Int> = MutableLiveData()
-
+    // Add tasks to Room
     fun addTask(todoItem: TodoItem) = runBlocking {
         launch {
             withContext(Dispatchers.IO) {
@@ -73,16 +67,17 @@ class StartRepository @Inject constructor(
 
     }
 
+    // Get all tasks from Room
     suspend fun getTasks(): List<TodoItem> {
-        tasks = transformTasks(false)
-//        mAdapter.setTasks(tasks)
-        return tasks
+        return transformTasks(false)
     }
 
+    // Get all not completed tasks from Room
     suspend fun getAllUncompletedTasks(): List<TodoItem> {
         return transformTasks(true)
     }
 
+    // Get all completed tasks from Room
     suspend fun getAllCompletedTasks(): List<TodoItem> = withContext(Dispatchers.IO) {
         val newList = mutableListOf<TodoItem>()
 
@@ -94,6 +89,7 @@ class StartRepository @Inject constructor(
         return@withContext newList
     }
 
+    // Get tasks from Room and convert them from Entity to Model
     private suspend fun transformTasks(isGetUncompletedTasks: Boolean): List<TodoItem> =
         withContext(Dispatchers.IO) {
             val newList = mutableListOf<TodoItem>()
@@ -112,7 +108,8 @@ class StartRepository @Inject constructor(
         }
 
 
-    suspend fun removeWork(todoItem: TodoItem) {
+    // Remove tasks from Room
+    suspend fun removeTask(todoItem: TodoItem) {
         val oldWorks = mAdapter.getTasks()
         val newWorks = mAdapter.getTasks().minus(todoItem)
 
@@ -166,6 +163,7 @@ class StartRepository @Inject constructor(
 
     fun getAdapter(): CustomRecyclerAdapter = mAdapter
 
+    // Set new list of tasks in Adapter
     fun setAllTasks(brandNewList: List<TodoItem>) {
 
         val diffCallback = UsersDiffCallback(mAdapter.getTasks(), brandNewList)
@@ -197,6 +195,10 @@ class StartRepository @Inject constructor(
         isCurrEditing = null
     }
 
+    // This function is used for HTTPS methods @GET and @POST
+    // with mock responses by MockWebServer.
+    //
+    // Doesn't participate in project.
     suspend fun testMockWebServer(callback: RequestCallback) {
         withContext(Dispatchers.IO) {
             val mockWebServer = MockWebServer()
@@ -210,7 +212,6 @@ class StartRepository @Inject constructor(
 
             val myUrl = mockWebServer.url("/v1/")
 
-            val oldList = tasks.toList()
             apiService.getRequest(myUrl.toString(), object : RequestCallback {
                 override fun onSuccess(response: String) {
                     val todoItem = Gson().fromJson(response, TodoItem::class.java)
@@ -223,7 +224,6 @@ class StartRepository @Inject constructor(
                     // TODO: implement this
                     callback.onFailure("error")
                 }
-
             })
         }
     }

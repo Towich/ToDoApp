@@ -56,7 +56,7 @@ class StartFragment : Fragment() {
         (requireContext().applicationContext as App).appComponent.startComponent().create().inject(this)
 
         // Instantiate ViewModel
-        viewModel = ViewModelProvider(this, viewModelFactory).get(StartViewModel::class.java)
+        viewModel = ViewModelProvider(this, viewModelFactory)[StartViewModel::class.java]
 
         // Connecting RecyclerView
         recyclerView = binding.recyclerView
@@ -95,14 +95,10 @@ class StartFragment : Fragment() {
 
         // onClick FAB - create a new task
         binding.fab.setOnClickListener {
-            view.findNavController().navigate(R.id.action_StartFragment_to_EditWorkFragment)
+//            view.findNavController().navigate(R.id.action_StartFragment_to_EditWorkFragment)
+            view.findNavController().navigate(R.id.action_StartFragment_to_editTaskFragment)
             viewModel.setCurrEditing(false)
         }
-
-        if(viewModel.showingUncompletedTasks)
-            binding.imageButtonShowCompletedTasks.setImageResource(R.drawable.visibility)
-        else
-            binding.imageButtonShowCompletedTasks.setImageResource(R.drawable.visibility_off)
 
         // onClick "Eye" - hide completed tasks
         binding.imageButtonShowCompletedTasks.setOnClickListener {
@@ -122,15 +118,19 @@ class StartFragment : Fragment() {
         }
 
         // LiveData with count of completed tasks
-        viewModel.completedTasks.observe(viewLifecycleOwner, Observer {
+        viewModel.completedTasks.observe(viewLifecycleOwner) {
             val completedTaskString = "Выполнено - " + viewModel.completedTasks.value
             binding.textViewCompletedTasks.text = completedTaskString
-        })
+        }
 
-        if(viewModel.showingUncompletedTasks)
+        if(viewModel.showingUncompletedTasks) {
             viewModel.setupUncompletedTasks()
-        else
+            binding.imageButtonShowCompletedTasks.setImageResource(R.drawable.visibility)
+        }
+        else {
             viewModel.setupTasks()
+            binding.imageButtonShowCompletedTasks.setImageResource(R.drawable.visibility_off)
+        }
 
         hideCompletedTasksOnToolBar()
         swipeToGesture(recyclerView)

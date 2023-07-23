@@ -48,6 +48,9 @@ class CustomRecyclerAdapter(private var tasks: List<TodoItem>) :
             holder.textDeadlineDate.visibility = View.VISIBLE
             holder.textDeadlineDate.text = todoItem.deadlineData.dropLast(6)
         }
+        else
+            holder.textDeadlineDate.visibility = View.GONE
+
 
         val importance: Boolean = todoItem.importance == "Высокий"
 
@@ -88,8 +91,7 @@ class CustomRecyclerAdapter(private var tasks: List<TodoItem>) :
             compoundButton.paintFlags =
                 compoundButton.paintFlags.or(Paint.STRIKE_THRU_TEXT_FLAG)
 
-            deadlineTextView.paintFlags =
-                    deadlineTextView.paintFlags.or(Paint.STRIKE_THRU_TEXT_FLAG)
+            deadlineTextView.paintFlags = compoundButton.paintFlags
 
             // Set GRAY color for CheckBox Text
             compoundButton.setTextColor(
@@ -107,8 +109,7 @@ class CustomRecyclerAdapter(private var tasks: List<TodoItem>) :
             compoundButton.paintFlags =
                 compoundButton.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
 
-            deadlineTextView.paintFlags =
-                compoundButton.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+            deadlineTextView.paintFlags = compoundButton.paintFlags
 
             // Set WHITE color for CheckBox Text
             compoundButton.setTextColor(

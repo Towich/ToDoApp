@@ -3,7 +3,6 @@ package com.example.todoapp.ui.ViewModel
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.*
 import com.example.todoapp.data.Repository.StartRepository
@@ -54,7 +53,7 @@ class StartViewModel @Inject constructor(
     // Remove task from Room
     fun removeTask(todoItem: TodoItem){
         viewModelScope.launch {
-            repository.removeWork(todoItem)
+            repository.removeTask(todoItem)
         }
     }
 
@@ -86,6 +85,7 @@ class StartViewModel @Inject constructor(
         completedTasks.value = completedTasks.value?.plus(delta)
     }
 
+    // Test MockWebServer
     fun testMockWebServer(){
         viewModelScope.launch(Dispatchers.IO) {
             repository.testMockWebServer(object: RequestCallback {
