@@ -1,10 +1,10 @@
 package com.example.todoapp.ui.Fragment
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
@@ -15,11 +15,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -32,7 +35,6 @@ import com.example.todoapp.ui.Activity.ui.theme.White
 import com.example.todoapp.ui.ViewModel.EditTaskViewModel
 import kotlinx.coroutines.launch
 import java.text.DateFormat
-import java.time.LocalDate
 import java.util.*
 import javax.inject.Inject
 
@@ -81,9 +83,10 @@ class EditTaskFragment : Fragment() {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.clearCurrModel()
+        viewModel.clearCurrEditing()
     }
 
     @Preview(
@@ -106,7 +109,7 @@ class EditTaskFragment : Fragment() {
         var showBottomSheet by remember { mutableStateOf(false) }
         var currentImportance by remember { mutableStateOf("Нет") }
 
-        if(isCurrEditing)
+        if (isCurrEditing)
             currentImportance = currModel.importance
 
         Scaffold(
@@ -203,24 +206,23 @@ class EditTaskFragment : Fragment() {
                     TextButton(
                         onClick = {
                             viewModel.removeTask(currModel)
-                            viewModel.clearCurrModel()
                             parentFragment?.findNavController()?.navigateUp()
                         },
                         enabled = isCurrEditing,
                         modifier = Modifier
                             .padding(start = 15.dp)
                     ) {
-                        Row{
+                        Row {
                             Icon(
                                 imageVector = Icons.Filled.Delete,
                                 contentDescription = "Delete Icon",
-                                tint = if(isCurrEditing) Color.Red else MaterialTheme.colorScheme.tertiary,
+                                tint = if (isCurrEditing) Color.Red else MaterialTheme.colorScheme.tertiary,
                                 modifier = Modifier
                                     .padding(top = 5.dp)
                             )
                             Text(
                                 text = "Удалить",
-                                color = if(isCurrEditing) Color.Red else MaterialTheme.colorScheme.tertiary,
+                                color = if (isCurrEditing) Color.Red else MaterialTheme.colorScheme.tertiary,
                                 style = MaterialTheme.typography.titleMedium,
                                 modifier = Modifier
                                     .padding(start = 15.dp)
@@ -281,7 +283,7 @@ class EditTaskFragment : Fragment() {
         var date by remember { mutableStateOf("") }
         var checkedState by remember { mutableStateOf(currModel.deadlineData != "") }
 
-        if(isCurrEditing) {
+        if (isCurrEditing) {
             date = currModel.deadlineData
         }
 
@@ -299,7 +301,7 @@ class EditTaskFragment : Fragment() {
                     checkedState = newValue
                     openDialog = newValue
 
-                    if(!newValue) {
+                    if (!newValue) {
                         date = ""
                         currModel.deadlineData = date
                     }
@@ -314,17 +316,21 @@ class EditTaskFragment : Fragment() {
                 )
             )
 
-            if(openDialog){
+            if (openDialog) {
                 val datePickerState = rememberDatePickerState()
 
                 DatePickerDialog(
-                    onDismissRequest = { openDialog = false },
+                    onDismissRequest = {
+                        openDialog = false
+                        checkedState = false
+                    },
                     confirmButton = {
                         TextButton(
                             onClick = {
                                 var pickedDate = Calendar.getInstance()
                                 pickedDate.timeInMillis = datePickerState.selectedDateMillis ?: 0
-                                date = DateFormat.getDateInstance(DateFormat.LONG).format(pickedDate.time).dropLast(8)
+                                date = DateFormat.getDateInstance(DateFormat.LONG)
+                                    .format(pickedDate.time).dropLast(8)
                                 currModel.deadlineData = date
                                 openDialog = false
                             }
@@ -435,7 +441,7 @@ class EditTaskFragment : Fragment() {
             mutableStateOf("")
         }
 
-        if(isCurrEditing)
+        if (isCurrEditing)
             value = currModel.textCase
 
         // Text Field
@@ -463,8 +469,9 @@ class EditTaskFragment : Fragment() {
                         contentColor = MaterialTheme.colorScheme.onSecondary
                     ),
                     content = {
-                        Box(modifier = Modifier
-                            .padding(all = 16.dp)
+                        Box(
+                            modifier = Modifier
+                                .padding(all = 16.dp)
                         ) {
                             innerTextField()
                         }
