@@ -17,6 +17,7 @@ class EditTaskViewModel @Inject constructor(
     // Add task in Room
     fun addTask(todoItem: TodoItem){
         repository.addTask(todoItem)
+        increaseCompletedTasks(1)
     }
 
     // Remove task from Room
@@ -31,6 +32,7 @@ class EditTaskViewModel @Inject constructor(
         viewModelScope.launch {
             repository.updateTask(todoItem)
         }
+        updateTaskInAdapter(todoItem)
     }
 
     // Update task in Adapter

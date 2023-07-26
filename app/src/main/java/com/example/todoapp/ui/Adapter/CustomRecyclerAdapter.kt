@@ -46,11 +46,10 @@ class CustomRecyclerAdapter(private var tasks: List<TodoItem>) :
         // Add TextView with deadline date to holder
         if (todoItem.deadlineData != "") {
             holder.textDeadlineDate.visibility = View.VISIBLE
-            holder.textDeadlineDate.text = todoItem.deadlineData.dropLast(6)
+            holder.textDeadlineDate.text = todoItem.deadlineData
         }
         else
             holder.textDeadlineDate.visibility = View.GONE
-
 
         val importance: Boolean = todoItem.importance == "Высокий"
 

@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -26,8 +28,12 @@ import com.example.todoapp.R
 import com.example.todoapp.data.model.TodoItem
 import com.example.todoapp.ui.Activity.ui.theme.Blue
 import com.example.todoapp.ui.Activity.ui.theme.ToDoAppTheme
+import com.example.todoapp.ui.Activity.ui.theme.White
 import com.example.todoapp.ui.ViewModel.EditTaskViewModel
 import kotlinx.coroutines.launch
+import java.text.DateFormat
+import java.time.LocalDate
+import java.util.*
 import javax.inject.Inject
 
 
@@ -99,6 +105,10 @@ class EditTaskFragment : Fragment() {
         val scope = rememberCoroutineScope()
         var showBottomSheet by remember { mutableStateOf(false) }
         var currentImportance by remember { mutableStateOf("Нет") }
+
+        if(isCurrEditing)
+            currentImportance = currModel.importance
+
         Scaffold(
             topBar = {
                 EditTaskTopBar()
@@ -182,13 +192,42 @@ class EditTaskFragment : Fragment() {
                     )
 
                     // Date picker with Switch
-                    DatePickerRow()
+                    DateRow()
 
                     Divider(
                         modifier = Modifier
                             .padding(top = 50.dp, bottom = 20.dp),
                         color = MaterialTheme.colorScheme.tertiary
                     )
+
+                    TextButton(
+                        onClick = {
+                            viewModel.removeTask(currModel)
+                            viewModel.clearCurrModel()
+                            parentFragment?.findNavController()?.navigateUp()
+                        },
+                        enabled = isCurrEditing,
+                        modifier = Modifier
+                            .padding(start = 15.dp)
+                    ) {
+                        Row{
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = "Delete Icon",
+                                tint = if(isCurrEditing) Color.Red else MaterialTheme.colorScheme.tertiary,
+                                modifier = Modifier
+                                    .padding(top = 5.dp)
+                            )
+                            Text(
+                                text = "Удалить",
+                                color = if(isCurrEditing) Color.Red else MaterialTheme.colorScheme.tertiary,
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier
+                                    .padding(start = 15.dp)
+                            )
+                        }
+
+                    }
 
                 }
             })
@@ -235,21 +274,35 @@ class EditTaskFragment : Fragment() {
         }
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun DatePickerRow() {
+    fun DateRow() {
+        var openDialog by remember { mutableStateOf(false) }
+        var date by remember { mutableStateOf("") }
+        var checkedState by remember { mutableStateOf(currModel.deadlineData != "") }
+
+        if(isCurrEditing) {
+            date = currModel.deadlineData
+        }
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 25.dp, end = 25.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            DatePickerText(currentDate = "27 июня")
+            DateText(currentDate = date)
 
-            var checkedState by remember { mutableStateOf(false) }
             Switch(
                 checked = checkedState,
                 onCheckedChange = { newValue ->
                     checkedState = newValue
+                    openDialog = newValue
+
+                    if(!newValue) {
+                        date = ""
+                        currModel.deadlineData = date
+                    }
                 },
                 colors = SwitchDefaults.colors(
                     uncheckedThumbColor = Blue,
@@ -260,11 +313,53 @@ class EditTaskFragment : Fragment() {
                     checkedBorderColor = Color.Transparent,
                 )
             )
+
+            if(openDialog){
+                val datePickerState = rememberDatePickerState()
+
+                DatePickerDialog(
+                    onDismissRequest = { openDialog = false },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                var pickedDate = Calendar.getInstance()
+                                pickedDate.timeInMillis = datePickerState.selectedDateMillis ?: 0
+                                date = DateFormat.getDateInstance(DateFormat.LONG).format(pickedDate.time).dropLast(8)
+                                currModel.deadlineData = date
+                                openDialog = false
+                            }
+                        ) {
+                            Text(
+                                text = "OK",
+                                color = Blue,
+                                style = MaterialTheme.typography.titleSmall
+                            )
+                        }
+                    }
+                ) {
+                    DatePicker(
+                        state = datePickerState,
+                        dateFormatter = DatePickerFormatter(
+                            "dd MMMM yyyy",
+                            "dd MMMM yyyy",
+                            "dd MMMM yyyy"
+                        ),
+                        colors = DatePickerDefaults.colors(
+                            todayContentColor = Color.Red,
+                            todayDateBorderColor = Color.Red,
+                            selectedDayContainerColor = Blue,
+                            selectedDayContentColor = White,
+                            selectedYearContainerColor = Blue,
+                            currentYearContentColor = Color.Red
+                        )
+                    )
+                }
+            }
         }
     }
 
     @Composable
-    fun DatePickerText(currentDate: String) {
+    fun DateText(currentDate: String) { // Selected date Text
         Column {
             Text(
                 text = "Сделать до",
@@ -307,17 +402,13 @@ class EditTaskFragment : Fragment() {
                 }
             },
             actions = {
-
                 // Save button
                 TextButton(
                     onClick = {
-                        if (isCurrEditing) {
+                        if (isCurrEditing)
                             viewModel.updateTask(currModel)
-                            viewModel.updateTaskInAdapter(currModel)
-                        } else {
+                        else
                             viewModel.addTask(currModel)
-                            viewModel.increaseCompletedTasks(1)
-                        }
 
                         parentFragment?.findNavController()?.navigateUp()
                     },
@@ -343,6 +434,10 @@ class EditTaskFragment : Fragment() {
         var value by remember {
             mutableStateOf("")
         }
+
+        if(isCurrEditing)
+            value = currModel.textCase
+
         // Text Field
         BasicTextField(
             value = value,
@@ -354,7 +449,7 @@ class EditTaskFragment : Fragment() {
                 .padding(top = 20.dp)
                 .verticalScroll(ScrollState(0), false),
             textStyle = MaterialTheme.typography.bodyLarge,
-            minLines = 8,
+            minLines = 5,
             decorationBox = { innerTextField ->
                 Card(
                     modifier = Modifier

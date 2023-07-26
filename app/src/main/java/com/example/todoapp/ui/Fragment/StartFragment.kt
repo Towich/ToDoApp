@@ -89,7 +89,7 @@ class StartFragment : Fragment() {
             override fun onClick(model: TodoItem) {
                 viewModel.setCurrModel(model)
                 viewModel.setCurrEditing(true)
-                view.findNavController().navigate(R.id.action_StartFragment_to_EditWorkFragment)
+                view.findNavController().navigate(R.id.action_StartFragment_to_editTaskFragment)
             }
         })
 
