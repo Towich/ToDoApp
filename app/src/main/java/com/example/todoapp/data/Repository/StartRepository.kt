@@ -33,7 +33,7 @@ class StartRepository @Inject constructor(
 
     private var tasks: List<TodoItem> = listOf()
     private var currModel: TodoItem? = null
-    private var isCurrEditing: Boolean? = null // Is current editing or creating a new work
+    private var isCurrEditing: Boolean = false // Is current editing or creating a new work
     private val mAdapter = CustomRecyclerAdapter(mutableListOf())
     var completedTasks: MutableLiveData<Int> = MutableLiveData()
     val months = arrayOf(
@@ -192,7 +192,7 @@ class StartRepository @Inject constructor(
 
     fun isCurrEditing() = isCurrEditing
     fun clearCurrEditing() {
-        isCurrEditing = null
+        isCurrEditing = false
     }
 
     // This function is used for HTTPS methods @GET and @POST

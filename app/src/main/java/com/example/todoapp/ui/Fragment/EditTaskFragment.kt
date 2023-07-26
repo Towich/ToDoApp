@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -24,6 +23,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.todoapp.App
 import com.example.todoapp.R
+import com.example.todoapp.data.model.TodoItem
+import com.example.todoapp.ui.Activity.ui.theme.Blue
 import com.example.todoapp.ui.Activity.ui.theme.ToDoAppTheme
 import com.example.todoapp.ui.ViewModel.EditTaskViewModel
 import kotlinx.coroutines.launch
@@ -39,6 +40,11 @@ class EditTaskFragment : Fragment() {
     // ViewModel
     private lateinit var viewModel: EditTaskViewModel
 
+    // Is currently editing
+    private var isCurrEditing: Boolean = false
+
+    private lateinit var currModel: TodoItem
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -48,6 +54,11 @@ class EditTaskFragment : Fragment() {
 
         // Initialize ViewModel
         viewModel = ViewModelProvider(this, viewModelFactory)[EditTaskViewModel::class.java]
+
+        isCurrEditing = viewModel.isCurrEditing()
+
+        // Get current editing model
+        currModel = viewModel.getCurrModel() ?: TodoItem(0, "", "", "", false)
     }
 
     override fun onCreateView(
@@ -87,7 +98,7 @@ class EditTaskFragment : Fragment() {
         val sheetState = rememberModalBottomSheetState()
         val scope = rememberCoroutineScope()
         var showBottomSheet by remember { mutableStateOf(false) }
-        var currentImportance by remember { mutableStateOf( "Нет") }
+        var currentImportance by remember { mutableStateOf("Нет") }
         Scaffold(
             topBar = {
                 EditTaskTopBar()
@@ -100,29 +111,17 @@ class EditTaskFragment : Fragment() {
 //                        .verticalScroll(rememberScrollState())
                     verticalArrangement = Arrangement.Top,
                 ) {
-                    EditTaskTextField()
-                    TextButton(
-                        onClick = { showBottomSheet = true },
-                        modifier = Modifier
-                            .padding(top = 25.dp, start = 15.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .padding(top = 10.dp)
-                        ) {
-                            Text(
-                                text = "Важность",
-                                color = MaterialTheme.colorScheme.onSecondary,
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                            Text(
-                                text = currentImportance,
-                                color = MaterialTheme.colorScheme.tertiary,
-                                style = MaterialTheme.typography.titleSmall
-                            )
-                        }
 
-                    }
+                    // TextField
+                    MTextField()
+
+                    // Importance Button
+                    ImportanceTextButton(
+                        onClicked = { showBottomSheet = true },
+                        currentImportance = currentImportance
+                    )
+
+                    // BottomSheet
                     if (showBottomSheet) {
                         ModalBottomSheet(
                             onDismissRequest = { showBottomSheet = false },
@@ -133,59 +132,153 @@ class EditTaskFragment : Fragment() {
                                     .fillMaxWidth(),
                                 horizontalArrangement = Arrangement.Center
                             ) {
-                                ExtendedFloatingActionButton(
-                                    onClick = {
+
+                                ItemBottomSheet(
+                                    textImportance = "Нет",
+                                    onClicked = {
                                         scope.launch { sheetState.hide() }.invokeOnCompletion {
                                             if (!sheetState.isVisible) {
                                                 showBottomSheet = false
                                             }
                                         }
                                         currentImportance = "Нет"
-                                    },
-                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                    modifier = Modifier
-                                        .padding(15.dp)
-                                ) {
-                                    Text(text = "Нет")
-                                }
+                                        currModel.importance = currentImportance
+                                    }
+                                )
 
-                                ExtendedFloatingActionButton(
-                                    onClick = {
+                                ItemBottomSheet(
+                                    textImportance = "Низкий",
+                                    onClicked = {
                                         scope.launch { sheetState.hide() }.invokeOnCompletion {
                                             if (!sheetState.isVisible) {
                                                 showBottomSheet = false
                                             }
                                         }
                                         currentImportance = "Низкий"
-                                    },
-                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                    modifier = Modifier
-                                        .padding(15.dp)
-                                ) {
-                                    Text(text = "Низкий")
-                                }
+                                        currModel.importance = currentImportance
+                                    }
+                                )
 
-                                ExtendedFloatingActionButton(
-                                    onClick = {
+                                ItemBottomSheet(
+                                    textImportance = "Высокий",
+                                    onClicked = {
                                         scope.launch { sheetState.hide() }.invokeOnCompletion {
                                             if (!sheetState.isVisible) {
                                                 showBottomSheet = false
                                             }
                                         }
-                                        currentImportance = "Высокийё"
-                                    },
-                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                    modifier = Modifier
-                                        .padding(15.dp)
-                                ) {
-                                    Text(text = "Высокий")
-                                }
+                                        currentImportance = "Высокий"
+                                        currModel.importance = currentImportance
+                                    }
+                                )
                             }
                         }
                     }
+
+                    Divider(
+                        modifier = Modifier
+                            .padding(top = 20.dp, bottom = 20.dp, start = 28.dp, end = 28.dp),
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+
+                    // Date picker with Switch
+                    DatePickerRow()
+
+                    Divider(
+                        modifier = Modifier
+                            .padding(top = 50.dp, bottom = 20.dp),
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+
                 }
             })
     }
+
+    @Composable
+    fun ImportanceTextButton(onClicked: () -> Unit, currentImportance: String) {
+        TextButton(
+            onClick = onClicked,
+            modifier = Modifier
+                .padding(top = 5.dp, start = 15.dp),
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(top = 10.dp)
+            ) {
+                Text(
+                    text = "Важность",
+                    color = MaterialTheme.colorScheme.onSecondary,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = currentImportance,
+                    color = MaterialTheme.colorScheme.tertiary,
+                    style = MaterialTheme.typography.titleSmall
+                )
+            }
+
+        }
+    }
+
+    @Composable
+    fun ItemBottomSheet(
+        onClicked: () -> Unit,
+        textImportance: String
+    ) {
+        ExtendedFloatingActionButton(
+            onClick = onClicked,
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            modifier = Modifier
+                .padding(15.dp)
+        ) {
+            Text(text = textImportance)
+        }
+    }
+
+    @Composable
+    fun DatePickerRow() {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 25.dp, end = 25.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            DatePickerText(currentDate = "27 июня")
+
+            var checkedState by remember { mutableStateOf(false) }
+            Switch(
+                checked = checkedState,
+                onCheckedChange = { newValue ->
+                    checkedState = newValue
+                },
+                colors = SwitchDefaults.colors(
+                    uncheckedThumbColor = Blue,
+                    checkedThumbColor = Blue,
+                    uncheckedTrackColor = MaterialTheme.colorScheme.secondary,
+                    checkedTrackColor = MaterialTheme.colorScheme.secondary,
+                    uncheckedBorderColor = Color.Transparent,
+                    checkedBorderColor = Color.Transparent,
+                )
+            )
+        }
+    }
+
+    @Composable
+    fun DatePickerText(currentDate: String) {
+        Column {
+            Text(
+                text = "Сделать до",
+                color = MaterialTheme.colorScheme.onSecondary,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = currentDate,
+                color = Blue,
+                style = MaterialTheme.typography.titleSmall
+            )
+        }
+    }
+
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -218,17 +311,18 @@ class EditTaskFragment : Fragment() {
                 // Save button
                 TextButton(
                     onClick = {
+                        if (isCurrEditing) {
+                            viewModel.updateTask(currModel)
+                            viewModel.updateTaskInAdapter(currModel)
+                        } else {
+                            viewModel.addTask(currModel)
+                            viewModel.increaseCompletedTasks(1)
+                        }
 
+                        parentFragment?.findNavController()?.navigateUp()
                     },
                     modifier = Modifier.padding(top = 20.dp, end = 10.dp)
                 ) {
-//                            Icon(
-//                                imageVector = Icons.Filled.Done,
-//                                contentDescription = "Done icon",
-//                                tint = MaterialTheme.colorScheme.onSecondary,
-//                                modifier = Modifier
-//                                    .size(35.dp)
-//                            )
                     Text(
                         text = "СОХРАНИТЬ",
                         color = colorResource(id = R.color.blue),
@@ -243,8 +337,9 @@ class EditTaskFragment : Fragment() {
         )
     }
 
+
     @Composable
-    fun EditTaskTextField() {
+    fun MTextField() {
         var value by remember {
             mutableStateOf("")
         }
@@ -253,35 +348,32 @@ class EditTaskFragment : Fragment() {
             value = value,
             onValueChange = { newText ->
                 value = newText
+                currModel.textCase = newText
             },
             modifier = Modifier
                 .padding(top = 20.dp)
                 .verticalScroll(ScrollState(0), false),
-//                        textStyle = TextStyle(
-//                            color = MaterialTheme.colorScheme.onSecondary,
-//                            fontSize = MaterialTheme.typography.bodyLarge
-//                        ),
             textStyle = MaterialTheme.typography.bodyLarge,
             minLines = 8,
             decorationBox = { innerTextField ->
-                Row(
+                Card(
                     modifier = Modifier
-                        .padding(horizontal = 20.dp) // margin left and right
-                        .fillMaxWidth()
-                        .background(
-                            color = MaterialTheme.colorScheme.secondary,
-                            shape = RoundedCornerShape(size = 8.dp)
-                        )
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = RoundedCornerShape(size = 8.dp)
-                        )
-                        .padding(all = 16.dp), // inner padding
-
-                ) {
-                    innerTextField()
-                }
+                        .padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 20.dp)
+                        .fillMaxWidth(),
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 10.dp
+                    ),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
+                    ),
+                    content = {
+                        Box(modifier = Modifier
+                            .padding(all = 16.dp)
+                        ) {
+                            innerTextField()
+                        }
+                    })
             }
         )
     }

@@ -46,6 +46,8 @@ class EditTaskViewModel @Inject constructor(
     // Get current editing model
     fun getCurrModel() = repository.getCurrModel()
 
+    fun setCurrModel(todoItem: TodoItem) = repository.setCurrModel(todoItem)
+
     // Is currently editing
     fun isCurrEditing() = repository.isCurrEditing()
 
