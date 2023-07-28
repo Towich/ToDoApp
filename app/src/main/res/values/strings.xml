@@ -7,6 +7,8 @@
     <string name="next">Next</string>
     <string name="previous">Previous</string>
     <string name="save">СОХРАНИТЬ</string>
+    <string name="channel_name">ToDoChannel</string>
+    <string name="channel_description">Channel for ToDoApp</string>
 
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris

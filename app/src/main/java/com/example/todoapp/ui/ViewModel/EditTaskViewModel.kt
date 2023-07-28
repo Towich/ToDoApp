@@ -1,5 +1,7 @@
 package com.example.todoapp.ui.ViewModel
 
+import android.content.Context
+import android.content.Intent
 import androidx.lifecycle.*
 import com.example.todoapp.data.Repository.StartRepository
 import com.example.todoapp.data.model.TodoItem
@@ -13,6 +15,7 @@ class EditTaskViewModel @Inject constructor(
     // Counter of completed tasks
     var completedTasks: MutableLiveData<Int> = repository.completedTasks
 
+    private var notificationId: Int = 0
 
     // Add task in Room
     fun addTask(todoItem: TodoItem){
@@ -78,4 +81,13 @@ class EditTaskViewModel @Inject constructor(
         completedTasks.value = completedTasks.value?.plus(delta)
     }
 
+    // Setup deadline notification
+    fun setNotificationAlarm(context: Context, intent: Intent, triggerAtMillis: Long){
+        repository.setNotificationAlarm(context, intent, triggerAtMillis)
+    }
+
+    // Cancel deadline notification
+    fun cancelNotificationAlarm(context: Context, intent: Intent){
+        repository.cancelNotificationAlarm(context, intent)
+    }
 }

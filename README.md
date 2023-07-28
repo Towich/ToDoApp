@@ -13,6 +13,7 @@
 - Hide completed tasks
 - Removing tasks by swiping left
 - Supports Day and Night themes
+- Send notification for expiring task deadline in 00:00
 
 # Technologies
 - Language: Kotlin

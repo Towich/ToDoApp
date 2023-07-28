@@ -1,7 +1,12 @@
 package com.example.todoapp.data.Repository
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.os.Handler
 import android.os.Looper
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DiffUtil
 import com.example.todoapp.data.database.TaskDao
@@ -20,7 +25,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import java.util.Calendar
+import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -50,6 +55,7 @@ class StartRepository @Inject constructor(
         "ноября",
         "декабря"
     )
+    val CHANNEL_ID = "77"
 
     // Add tasks to Room
     fun addTask(todoItem: TodoItem) = runBlocking {
@@ -226,5 +232,41 @@ class StartRepository @Inject constructor(
                 }
             })
         }
+    }
+
+    fun getChannelID(): String {
+        return CHANNEL_ID
+    }
+
+    // Create Notification alarm at specific time
+    fun setNotificationAlarm(context: Context, intent: Intent, triggerAtMillis: Long) {
+
+        // Alarm Manager
+        val am = ContextCompat.getSystemService(context, AlarmManager::class.java) as AlarmManager
+
+        // Pending Intent
+        val pendingIntent =
+            PendingIntent.getBroadcast(context, 1234, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+
+        // Set alarm for specific time
+        am.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+    }
+
+    // Cancel Notification alarm
+    fun cancelNotificationAlarm(context: Context, intent: Intent) {
+
+        // Alarm Manager
+        val am = ContextCompat.getSystemService(
+            context,
+            AlarmManager::class.java
+        ) as AlarmManager
+
+        // Pending Intent
+        val pendingIntent = PendingIntent.getBroadcast(
+            context, 1234, intent, PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // Cancel founded Pending Intent
+        am.cancel(pendingIntent)
     }
 }
