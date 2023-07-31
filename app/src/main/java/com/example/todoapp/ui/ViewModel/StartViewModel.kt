@@ -1,6 +1,7 @@
 package com.example.todoapp.ui.ViewModel
 
 import android.content.Context
+import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
@@ -102,5 +103,10 @@ class StartViewModel @Inject constructor(
                 }
             })
         }
+    }
+
+    // Cancel deadline notification
+    fun cancelNotificationAlarm(context: Context, todoItem_id: Int){
+        repository.cancelNotificationAlarm(context, todoItem_id)
     }
 }

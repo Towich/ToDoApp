@@ -6,6 +6,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DiffUtil
@@ -18,6 +20,7 @@ import com.example.todoapp.data.network.FileReader
 import com.example.todoapp.data.network.RequestCallback
 import com.example.todoapp.ui.Adapter.CustomRecyclerAdapter
 import com.example.todoapp.ui.Adapter.UsersDiffCallback
+import com.example.todoapp.ui.Service.MyReceiver
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -69,8 +72,32 @@ class StartRepository @Inject constructor(
         Handler(Looper.getMainLooper()).post {
             getAdapter().notifyItemInserted(mAdapter.getTasks().size)
         }
+    }
 
+    fun addTaskWithAlarm(
+        context: Context,
+        todoItem: TodoItem,
+        triggerAtMillis: Long
+    ) = runBlocking {
 
+        val newList = mutableListOf<TodoItem>()
+
+        launch {
+            withContext(Dispatchers.IO) {
+                taskDao.insertTask(todoItem.toEntity())
+
+                val dbList = taskDao.getAllTasks()
+                for (e in dbList) {
+                    newList.add(e.toModel())
+                }
+
+                setNotificationAlarm(context, newList[newList.size-1], triggerAtMillis)
+            }
+        }
+
+        Handler(Looper.getMainLooper()).post {
+            getAdapter().notifyItemInserted(mAdapter.getTasks().size)
+        }
     }
 
     // Get all tasks from Room
@@ -239,21 +266,38 @@ class StartRepository @Inject constructor(
     }
 
     // Create Notification alarm at specific time
-    fun setNotificationAlarm(context: Context, intent: Intent, triggerAtMillis: Long) {
+    fun setNotificationAlarm(context: Context, todoItem: TodoItem, triggerAtMillis: Long) {
+        // Intent for creating Notification
+        val intent = Intent(context, MyReceiver::class.java)
+        intent.action = todoItem.id.toString()
+        intent.putExtra("id", todoItem.id)
+        intent.putExtra("title", todoItem.textCase)
+        intent.putExtra("text", "Дата дедлайна: " + todoItem.deadlineData)
 
         // Alarm Manager
         val am = ContextCompat.getSystemService(context, AlarmManager::class.java) as AlarmManager
 
         // Pending Intent
-        val pendingIntent =
-            PendingIntent.getBroadcast(context, 1234, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context, todoItem.id, intent, 0
+        )
+
+        Log.i("mINTENT_create", "Request code | " + todoItem.id.toString())
+        Log.i("mINTENT_create", "Action | " + intent.action)
+        Log.i("mINTENT_create", "Data | " + intent.data)
+        Log.i("mINTENT_create", "Package | " + intent.`package`)
+        Log.i("mINTENT_create", "Component | " + intent.component)
+        Log.i("mINTENT_create", "Categories | " + intent.categories)
 
         // Set alarm for specific time
         am.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
     }
 
     // Cancel Notification alarm
-    fun cancelNotificationAlarm(context: Context, intent: Intent) {
+    fun cancelNotificationAlarm(context: Context, todoItem_id: Int) {
+        // Intent
+        val intent = Intent(context, MyReceiver::class.java)
+        intent.action = todoItem_id.toString()
 
         // Alarm Manager
         val am = ContextCompat.getSystemService(
@@ -263,10 +307,24 @@ class StartRepository @Inject constructor(
 
         // Pending Intent
         val pendingIntent = PendingIntent.getBroadcast(
-            context, 1234, intent, PendingIntent.FLAG_IMMUTABLE
+            context, todoItem_id, intent, 0
         )
 
+        Log.i("mINTENT", "Request code | " + todoItem_id)
+        Log.i("mINTENT", "Action | " + intent.action)
+        Log.i("mINTENT", "Data | " + intent.data)
+        Log.i("mINTENT", "Package | " + intent.`package`)
+        Log.i("mINTENT", "Component | " + intent.component)
+        Log.i("mINTENT", "Categories | " + intent.categories)
+
+        if (pendingIntent == null) {
+            Toast.makeText(context, "PendingIntent not found!", Toast.LENGTH_LONG).show()
+            return
+        }
+
         // Cancel founded Pending Intent
+        pendingIntent.cancel()
         am.cancel(pendingIntent)
+        Log.i("PENDING_INTENT", pendingIntent.toString())
     }
 }

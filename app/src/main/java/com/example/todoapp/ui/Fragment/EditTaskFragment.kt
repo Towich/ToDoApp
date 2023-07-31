@@ -1,13 +1,9 @@
 package com.example.todoapp.ui.Fragment
 
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
@@ -23,7 +19,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -33,7 +28,6 @@ import com.example.todoapp.data.model.TodoItem
 import com.example.todoapp.ui.Activity.ui.theme.Blue
 import com.example.todoapp.ui.Activity.ui.theme.ToDoAppTheme
 import com.example.todoapp.ui.Activity.ui.theme.White
-import com.example.todoapp.ui.Service.MyReceiver
 import com.example.todoapp.ui.ViewModel.EditTaskViewModel
 import kotlinx.coroutines.launch
 import java.text.DateFormat
@@ -128,7 +122,7 @@ class EditTaskFragment : Fragment() {
                     verticalArrangement = Arrangement.Top,
                 ) {
 
-                    // TextField
+                    // Input TextField
                     MTextField()
 
                     // Importance Button
@@ -137,7 +131,7 @@ class EditTaskFragment : Fragment() {
                         currentImportance = currentImportance
                     )
 
-                    // BottomSheet
+                    // BottomSheet-selector of importance
                     if (showBottomSheet) {
                         ModalBottomSheet(
                             onDismissRequest = { showBottomSheet = false },
@@ -191,6 +185,7 @@ class EditTaskFragment : Fragment() {
                         }
                     }
 
+                    // Divider
                     Divider(
                         modifier = Modifier
                             .padding(top = 20.dp, bottom = 20.dp, start = 28.dp, end = 28.dp),
@@ -200,15 +195,24 @@ class EditTaskFragment : Fragment() {
                     // Date picker with Switch
                     DateRow()
 
+                    // Divider
                     Divider(
                         modifier = Modifier
                             .padding(top = 50.dp, bottom = 20.dp),
                         color = MaterialTheme.colorScheme.tertiary
                     )
 
+                    // Delete button
                     TextButton(
                         onClick = {
+
+                            // Cancel Notification Alarm
+                            viewModel.cancelNotificationAlarm(requireContext(), currModel.id)
+
+                            // Remove task from DB
                             viewModel.removeTask(currModel)
+
+                            // Go to StartFragment
                             parentFragment?.findNavController()?.navigateUp()
                         },
                         enabled = isCurrEditing,
@@ -330,6 +334,7 @@ class EditTaskFragment : Fragment() {
                     confirmButton = {
                         TextButton(
                             onClick = {
+                                // Get picked date
                                 val pickedDate = Calendar.getInstance()
                                 pickedDate.timeInMillis = datePickerState.selectedDateMillis ?: 0
 
@@ -345,6 +350,8 @@ class EditTaskFragment : Fragment() {
 
                                 // Change deadlineDate in current model
                                 currModel.deadlineData = date
+
+                                // Close DatePickerDialog
                                 openDialog = false
                             }
                         ) {
@@ -424,30 +431,36 @@ class EditTaskFragment : Fragment() {
                 // Save button
                 TextButton(
                     onClick = {
-                        // Intent for creating Notification
-                        val intent = Intent(context, MyReceiver::class.java)
-                        intent.action = currModel.id.toString()
-                        intent.putExtra("id", currModel.id)
-                        intent.putExtra("title", currModel.textCase)
-                        intent.putExtra("text", "Дата дедлайна: " + currModel.deadlineData)
-
                         // If currently editing an existing task
                         if (isCurrEditing) {
+
+                            // Update an existing task
                             viewModel.updateTask(currModel)
 
                             // If date has been changed
-                            if(currCalendar != null) {
+                            if (currCalendar != null) {
 
                                 // Cancel previous alarm and create a new
-                                viewModel.cancelNotificationAlarm(requireContext(), intent)
-                                viewModel.setNotificationAlarm(requireContext(), intent, currCalendar!!.timeInMillis)
+                                viewModel.cancelNotificationAlarm(
+                                    requireContext().applicationContext,
+                                    currModel.id
+                                )
+                                viewModel.setNotificationAlarm(
+                                    requireContext().applicationContext,
+                                    currModel,
+                                    currCalendar!!.timeInMillis
+                                )
                             }
-                        }
-                        else{
-                            viewModel.addTask(currModel)
-
-                            // Create a new alarm for Notification
-                            viewModel.setNotificationAlarm(requireContext(), intent, currCalendar!!.timeInMillis)
+                        } else {
+                            // Create a new task with/without Notification Alarm
+                            if (currModel.deadlineData == "")
+                                viewModel.addTask(currModel)
+                            else
+                                viewModel.addTaskWithAlarm(
+                                    requireContext().applicationContext,
+                                    currModel,
+                                    currCalendar!!.timeInMillis
+                                )
                         }
 
                         parentFragment?.findNavController()?.navigateUp()
@@ -467,7 +480,6 @@ class EditTaskFragment : Fragment() {
             )
         )
     }
-
 
     @Composable
     fun MTextField() {

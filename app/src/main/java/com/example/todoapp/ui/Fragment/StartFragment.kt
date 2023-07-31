@@ -129,7 +129,7 @@ class StartFragment : Fragment() {
     }
 
     // Tracking the gesture "swiping left"
-    // - then task has swiped left, removing it
+    // then task has swiped left, removing it
     private fun swipeToGesture(itemRecyclerView: RecyclerView?) {
 
         val swipeGesture = object : SwipeGesture(requireContext()) {
@@ -140,15 +140,19 @@ class StartFragment : Fragment() {
 
                 try {
                     when (direction) {
-
                         ItemTouchHelper.LEFT -> {
+                            // Get todoItem to remove
                             val deleteItem = viewModel.getAdapter().getTasks()[position]
+
+                            // Cancel Notification
+                            viewModel.cancelNotificationAlarm(requireContext().applicationContext, deleteItem.id)
+
+                            // Remove task from DB
                             viewModel.removeTask(deleteItem)
 
                             if (deleteItem.completed)
                                 viewModel.increaseCompletedTasks(-1)
                         }
-
                     }
                 } catch (e: Exception) {
                     Toast.makeText(

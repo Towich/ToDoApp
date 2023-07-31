@@ -13,14 +13,23 @@ class EditTaskViewModel @Inject constructor(
 ) : ViewModel() {
 
     // Counter of completed tasks
-    var completedTasks: MutableLiveData<Int> = repository.completedTasks
+    private var completedTasks: MutableLiveData<Int> = repository.completedTasks
 
     private var notificationId: Int = 0
 
     // Add task in Room
     fun addTask(todoItem: TodoItem){
         repository.addTask(todoItem)
-        increaseCompletedTasks(1)
+//        increaseCompletedTasks(1)
+    }
+
+    // Add task in Room with creating Notification Alarm
+    fun addTaskWithAlarm(
+        context: Context,
+        todoItem: TodoItem,
+        triggerAtMillis: Long
+    ){
+        repository.addTaskWithAlarm(context, todoItem, triggerAtMillis)
     }
 
     // Remove task from Room
@@ -82,12 +91,12 @@ class EditTaskViewModel @Inject constructor(
     }
 
     // Setup deadline notification
-    fun setNotificationAlarm(context: Context, intent: Intent, triggerAtMillis: Long){
-        repository.setNotificationAlarm(context, intent, triggerAtMillis)
+    fun setNotificationAlarm(context: Context, todoItem: TodoItem, triggerAtMillis: Long){
+        repository.setNotificationAlarm(context, todoItem, triggerAtMillis)
     }
 
     // Cancel deadline notification
-    fun cancelNotificationAlarm(context: Context, intent: Intent){
-        repository.cancelNotificationAlarm(context, intent)
+    fun cancelNotificationAlarm(context: Context, todoItem_id: Int){
+        repository.cancelNotificationAlarm(context, todoItem_id)
     }
 }
