@@ -9,7 +9,6 @@ import androidx.core.content.ContextCompat
 import com.example.todoapp.data.model.TodoItem
 import com.example.todoapp.ui.Service.MyReceiver
 
-
 /**
  * Static class for create and cancel Notification Alarms.
  */

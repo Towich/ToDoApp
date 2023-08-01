@@ -235,7 +235,7 @@ class StartRepository @Inject constructor(
 
     // This function is used for HTTPS methods @GET and @POST
     // with mock responses by MockWebServer.
-    //
+
     // Doesn't participate in project.
     suspend fun testMockWebServer(callback: RequestCallback) {
         withContext(Dispatchers.IO) {
