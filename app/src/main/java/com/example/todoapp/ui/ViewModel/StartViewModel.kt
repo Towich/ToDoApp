@@ -128,12 +128,17 @@ class StartViewModel @Inject constructor(
     fun showSnackbarCancelRemove(
         context: Context,
         mView: View,
-        deleteItem: TodoItem
+        deleteItem: TodoItem,
+        onClick: () -> Unit
     ){
-        repository.showSnackbarCancelRemove(context, mView, deleteItem)
+        repository.showSnackbarCancelRemove(context, mView, deleteItem, onClick)
     }
 
     fun dismissShowingSnackbar(){
         repository.dismissShowingSnackbar()
     }
+
+     fun animateNewHeight(view: View, newHeight: Int) {
+         repository.animateNewHeight(view, newHeight)
+     }
 }

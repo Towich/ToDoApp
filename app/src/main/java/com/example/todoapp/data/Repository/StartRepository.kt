@@ -1,5 +1,6 @@
 package com.example.todoapp.data.Repository
 
+import android.animation.ValueAnimator
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -284,7 +285,8 @@ class StartRepository @Inject constructor(
     fun showSnackbarCancelRemove(
         context: Context,
         mView: View,
-        deleteItem: TodoItem
+        deleteItem: TodoItem,
+        onClick: () -> Unit
     ){
         val snackBarText = "Удалено: " + deleteItem.textCase    // Snackbar's Text
         val snackBarDuration = Snackbar.LENGTH_LONG             // Snackbar's Duration
@@ -313,6 +315,8 @@ class StartRepository @Inject constructor(
             // increase counter of completed tasks
             if (deleteItem.completed)
                 completedTasks.value = completedTasks.value?.plus(1)
+
+            onClick()
         }
 
         // Add callback to Snackbar
@@ -345,5 +349,17 @@ class StartRepository @Inject constructor(
             showingSnackbar?.dismiss()
             showingSnackbar = null
         }
+    }
+
+    fun animateNewHeight(view: View, newHeight: Int) {
+        val valueAnimator = ValueAnimator.ofInt(view.measuredHeight, newHeight)
+        valueAnimator.duration = 500L
+        valueAnimator.addUpdateListener {
+            val animatedValue = valueAnimator.animatedValue as Int
+            val layoutParams = view.layoutParams
+            layoutParams.height = animatedValue
+            view.layoutParams = layoutParams
+        }
+        valueAnimator.start()
     }
 }

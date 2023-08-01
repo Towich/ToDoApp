@@ -1,5 +1,6 @@
 package com.example.todoapp.ui.Adapter
 
+import android.animation.ValueAnimator
 import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
@@ -14,9 +15,8 @@ import com.example.todoapp.R
 import com.example.todoapp.data.model.TodoItem
 
 
-class CustomRecyclerAdapter(private var tasks: List<TodoItem>) :
+open class CustomRecyclerAdapter(private var tasks: List<TodoItem>) :
     RecyclerView.Adapter<CustomRecyclerAdapter.MyViewHolder>() {
-
     private var onClickListenerCheckBoxButton: OnClickListener? = null
     private var onClickListenerInfoButton: OnClickListener? = null
 
@@ -37,7 +37,6 @@ class CustomRecyclerAdapter(private var tasks: List<TodoItem>) :
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-
         val todoItem: TodoItem = tasks[position]
 
         holder.checkBox.text = todoItem.textCase
@@ -47,18 +46,22 @@ class CustomRecyclerAdapter(private var tasks: List<TodoItem>) :
         if (todoItem.deadlineData != "") {
             holder.textDeadlineDate.visibility = View.VISIBLE
             holder.textDeadlineDate.text = todoItem.deadlineData
-        }
-        else
+        } else
             holder.textDeadlineDate.visibility = View.GONE
 
         val importance: Boolean = todoItem.importance == "Высокий"
 
-        updateStatusOfWork(holder.checkBox, holder.textDeadlineDate , todoItem.completed, importance)
+        updateStatusOfWork(holder.checkBox, holder.textDeadlineDate, todoItem.completed, importance)
 
         // Click on CheckBox
         holder.checkBox.setOnClickListener {
             run {
-                updateStatusOfWork(holder.checkBox, holder.textDeadlineDate, !todoItem.completed, importance)
+                updateStatusOfWork(
+                    holder.checkBox,
+                    holder.textDeadlineDate,
+                    !todoItem.completed,
+                    importance
+                )
                 todoItem.completed = !todoItem.completed
 
                 if (onClickListenerCheckBoxButton != null) {
@@ -144,6 +147,5 @@ class CustomRecyclerAdapter(private var tasks: List<TodoItem>) :
     interface OnClickListener {
         fun onClick(model: TodoItem)
     }
-
 }
 

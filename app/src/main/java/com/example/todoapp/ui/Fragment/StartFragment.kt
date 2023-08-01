@@ -20,6 +20,7 @@ import com.example.todoapp.ui.ViewModel.StartViewModel
 import com.example.todoapp.ui.gesture.SwipeGesture
 import javax.inject.Inject
 
+
 /**
  * A fragment which shows and controls the list of tasks.
  */
@@ -136,7 +137,6 @@ class StartFragment : Fragment() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
 
                 val position = viewHolder.absoluteAdapterPosition
-                val actionBtnTapped = false
 
                 // Get todoItem to remove
                 val deleteItem = viewModel.getAdapter().getTasks()[position]
@@ -149,6 +149,13 @@ class StartFragment : Fragment() {
 
                             if (deleteItem.completed)
                                 viewModel.increaseCompletedTasks(-1)
+
+                            // Decrease height RecyclerView with animation
+                            viewModel.animateNewHeight(
+                                recyclerView,
+                                recyclerView.measuredHeight - viewHolder.itemView.measuredHeight
+                            )
+
                         }
                     }
                 } catch (e: Exception) {
@@ -164,7 +171,14 @@ class StartFragment : Fragment() {
                     requireContext().applicationContext,
                     itemRecyclerView!!,
                     deleteItem
-                )
+                ) {
+                    // If action button has pressed
+                    // Increase RecyclerView's height
+                    viewModel.animateNewHeight(
+                        recyclerView,
+                        recyclerView.measuredHeight + viewHolder.itemView.measuredHeight
+                    )
+                }
             }
         }
 
