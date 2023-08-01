@@ -138,15 +138,12 @@ class StartFragment : Fragment() {
                 val position = viewHolder.absoluteAdapterPosition
                 val actionBtnTapped = false
 
+                // Get todoItem to remove
+                val deleteItem = viewModel.getAdapter().getTasks()[position]
+
                 try {
                     when (direction) {
                         ItemTouchHelper.LEFT -> {
-                            // Get todoItem to remove
-                            val deleteItem = viewModel.getAdapter().getTasks()[position]
-
-                            // Cancel Notification
-                            viewModel.cancelNotificationAlarm(requireContext().applicationContext, deleteItem.id)
-
                             // Remove task from DB
                             viewModel.removeTask(deleteItem)
 
@@ -161,6 +158,13 @@ class StartFragment : Fragment() {
                         Toast.LENGTH_LONG
                     ).show()
                 }
+
+                // Show Snackbar
+                viewModel.showSnackbarCancelRemove(
+                    requireContext().applicationContext,
+                    itemRecyclerView!!,
+                    deleteItem
+                )
             }
         }
 
@@ -190,5 +194,6 @@ class StartFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        viewModel.dismissShowingSnackbar()
     }
 }

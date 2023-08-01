@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
@@ -21,6 +22,9 @@ import com.example.todoapp.data.network.RequestCallback
 import com.example.todoapp.ui.Adapter.CustomRecyclerAdapter
 import com.example.todoapp.ui.Adapter.UsersDiffCallback
 import com.example.todoapp.ui.Service.MyReceiver
+import com.example.todoapp.ui.util.NotificAlarmManager
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,6 +47,7 @@ class StartRepository @Inject constructor(
     private var currModel: TodoItem? = null
     private var isCurrEditing: Boolean = false // Is current editing or creating a new work
     private val mAdapter = CustomRecyclerAdapter(mutableListOf())
+    private var showingSnackbar: Snackbar? = null
     var completedTasks: MutableLiveData<Int> = MutableLiveData()
     val months = arrayOf(
         "января",
@@ -267,64 +272,78 @@ class StartRepository @Inject constructor(
 
     // Create Notification alarm at specific time
     fun setNotificationAlarm(context: Context, todoItem: TodoItem, triggerAtMillis: Long) {
-        // Intent for creating Notification
-        val intent = Intent(context, MyReceiver::class.java)
-        intent.action = todoItem.id.toString()
-        intent.putExtra("id", todoItem.id)
-        intent.putExtra("title", todoItem.textCase)
-        intent.putExtra("text", "Дата дедлайна: " + todoItem.deadlineData)
-
-        // Alarm Manager
-        val am = ContextCompat.getSystemService(context, AlarmManager::class.java) as AlarmManager
-
-        // Pending Intent
-        val pendingIntent = PendingIntent.getBroadcast(
-            context, todoItem.id, intent, 0
-        )
-
-        Log.i("mINTENT_create", "Request code | " + todoItem.id.toString())
-        Log.i("mINTENT_create", "Action | " + intent.action)
-        Log.i("mINTENT_create", "Data | " + intent.data)
-        Log.i("mINTENT_create", "Package | " + intent.`package`)
-        Log.i("mINTENT_create", "Component | " + intent.component)
-        Log.i("mINTENT_create", "Categories | " + intent.categories)
-
-        // Set alarm for specific time
-        am.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+        NotificAlarmManager.setNotificationAlarm(context, todoItem, triggerAtMillis)
     }
 
     // Cancel Notification alarm
     fun cancelNotificationAlarm(context: Context, todoItem_id: Int) {
-        // Intent
-        val intent = Intent(context, MyReceiver::class.java)
-        intent.action = todoItem_id.toString()
+        NotificAlarmManager.cancelNotificationAlarm(context, todoItem_id)
+    }
 
-        // Alarm Manager
-        val am = ContextCompat.getSystemService(
-            context,
-            AlarmManager::class.java
-        ) as AlarmManager
+    // Show Snackbar with option of cancel removing task
+    fun showSnackbarCancelRemove(
+        context: Context,
+        mView: View,
+        deleteItem: TodoItem
+    ){
+        val snackBarText = "Удалено: " + deleteItem.textCase    // Snackbar's Text
+        val snackBarDuration = Snackbar.LENGTH_LONG             // Snackbar's Duration
+        val snackBarTextButton = "ОТМЕНИТЬ"
 
-        // Pending Intent
-        val pendingIntent = PendingIntent.getBroadcast(
-            context, todoItem_id, intent, 0
+        // Instantiate Snackbar
+        val snackbar = Snackbar.make(
+            mView,
+            snackBarText,
+            snackBarDuration
         )
 
-        Log.i("mINTENT", "Request code | " + todoItem_id)
-        Log.i("mINTENT", "Action | " + intent.action)
-        Log.i("mINTENT", "Data | " + intent.data)
-        Log.i("mINTENT", "Package | " + intent.`package`)
-        Log.i("mINTENT", "Component | " + intent.component)
-        Log.i("mINTENT", "Categories | " + intent.categories)
+        // Set action for Snackbar's button "Cancel"
+        snackbar.setAction(snackBarTextButton) {
 
-        if (pendingIntent == null) {
-            Toast.makeText(context, "PendingIntent not found!", Toast.LENGTH_LONG).show()
-            return
+            // Add task to Room
+            addTask(deleteItem)
+
+            // Refresh list in Adapter of RecyclerView
+            runBlocking {
+                val tasksList = getTasks()
+                setAllTasks(tasksList)
+            }
+
+            // If deleted task has been completed,
+            // increase counter of completed tasks
+            if (deleteItem.completed)
+                completedTasks.value = completedTasks.value?.plus(1)
         }
 
-        // Cancel founded Pending Intent
-        pendingIntent.cancel()
-        am.cancel(pendingIntent)
-        Log.i("PENDING_INTENT", pendingIntent.toString())
+        // Add callback to Snackbar
+        snackbar.addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+            // Callback of Snackbar's appear
+            override fun onShown(transientBottomBar: Snackbar?) {
+                super.onShown(transientBottomBar)
+            }
+
+            // Callback of Snackbar's dismiss
+            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                super.onDismissed(transientBottomBar, event)
+
+                if (event != DISMISS_EVENT_ACTION) {    // if Snackbar dismissed by any case, otherwise by action
+                    // Cancel Notification
+                    cancelNotificationAlarm(
+                        context,
+                        deleteItem.id
+                    )
+                }
+            }
+        })
+
+        snackbar.show()
+        showingSnackbar = snackbar
+    }
+
+    fun dismissShowingSnackbar(){
+        if(showingSnackbar != null){
+            showingSnackbar?.dismiss()
+            showingSnackbar = null
+        }
     }
 }

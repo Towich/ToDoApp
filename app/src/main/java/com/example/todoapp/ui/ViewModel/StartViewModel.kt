@@ -4,12 +4,14 @@ import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
+import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.*
 import com.example.todoapp.data.Repository.StartRepository
 import com.example.todoapp.data.model.TodoItem
 import com.example.todoapp.data.network.RequestCallback
 import com.example.todoapp.ui.Adapter.CustomRecyclerAdapter
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -24,12 +26,25 @@ class StartViewModel @Inject constructor(
 
     // Tasks
 
+    // Add task in Room
+    fun addTask(todoItem: TodoItem){
+        repository.addTask(todoItem)
+    }
+
+    // Add task in Room with creating Notification Alarm
+    fun addTaskWithAlarm(
+        context: Context,
+        todoItem: TodoItem,
+        triggerAtMillis: Long
+    ){
+        repository.addTaskWithAlarm(context, todoItem, triggerAtMillis)
+    }
+
     // Get all tasks from Room
     // and setup into RecyclerView's Adapter
     fun setupTasks() {
         viewModelScope.launch {
             val tasksList = repository.getTasks()
-//            repository.getAdapter().notifyDataSetChanged()
             repository.setAllTasks(tasksList)
         }
     }
@@ -108,5 +123,17 @@ class StartViewModel @Inject constructor(
     // Cancel deadline notification
     fun cancelNotificationAlarm(context: Context, todoItem_id: Int){
         repository.cancelNotificationAlarm(context, todoItem_id)
+    }
+
+    fun showSnackbarCancelRemove(
+        context: Context,
+        mView: View,
+        deleteItem: TodoItem
+    ){
+        repository.showSnackbarCancelRemove(context, mView, deleteItem)
+    }
+
+    fun dismissShowingSnackbar(){
+        repository.dismissShowingSnackbar()
     }
 }

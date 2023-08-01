@@ -205,7 +205,6 @@ class EditTaskFragment : Fragment() {
                     // Delete button
                     TextButton(
                         onClick = {
-
                             // Cancel Notification Alarm
                             viewModel.cancelNotificationAlarm(requireContext(), currModel.id)
 
