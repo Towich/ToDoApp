@@ -30,7 +30,7 @@ abstract class UploadTask: DefaultTask() {
                 .filter { it.name.endsWith(".apk")}
                 .forEach { apkFile ->
                     api.uploadFile(apkFile, token, chatId)  // upload file to chat in Telegram
-                    api.sendMessage("APK size: ${apkSizeFile.get().asFile.readText()}", token, chatId)  // send message in Telegram
+                    api.sendMessage("APK size: ${apkSizeFile.get().asFile.readText()} MB", token, chatId)  // send message in Telegram
                 }
         }
     }

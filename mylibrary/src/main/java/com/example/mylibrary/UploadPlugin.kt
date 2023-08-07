@@ -8,9 +8,13 @@ import org.gradle.api.provider.Property
 import java.io.File
 
 class UploadPlugin : Plugin<Project> {
+    private val validateTaskActive = true
+    private val apkMaxSize = 10.0
 
     override fun apply(project: Project) {
         val extension = project.extensions.create("uploadExtension", UploadPluginExtension::class.java)
+        extension.validateTaskActive.set(this.validateTaskActive)
+        extension.maxApkSize.set(this.apkMaxSize)
 
         val androidComponents =
             project.extensions.findByType(AndroidComponentsExtension::class.java)

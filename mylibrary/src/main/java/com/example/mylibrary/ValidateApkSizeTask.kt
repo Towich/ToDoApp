@@ -25,9 +25,11 @@ abstract class ValidateApkSizeTask : DefaultTask() {
         val token = Confidential.token
         val chatId = Confidential.chatId
 
-//        val extension = project.extensions.getByType(UploadPluginExtension::class.java)
-//        val maxSize = extension.maxApkSize.get() // MB
-        val maxSize = 10.0
+        val extension = project.extensions.getByType(UploadPluginExtension::class.java)
+            ?: throw NullPointerException("UploadPluginExtension not found")
+        val validateTaskActive = extension.validateTaskActive.get()
+        val maxSize = extension.maxApkSize.get() // MB
+
 
         runBlocking {
             apkDir.get().asFile.listFiles()
@@ -37,7 +39,7 @@ abstract class ValidateApkSizeTask : DefaultTask() {
                         .toDouble()
 
                     // If apk size is more than max size
-                    if (apkSize > maxSize) {
+                    if (validateTaskActive && apkSize > maxSize) {
                         val message = "APK file is more than $maxSize MB! \n(apkSize = $apkSize)"
 
                         api.sendMessage(message, token, chatId)         // send message in Telegram
