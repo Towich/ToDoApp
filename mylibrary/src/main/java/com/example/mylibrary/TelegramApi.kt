@@ -9,7 +9,6 @@ import java.io.File
 class TelegramApi(
     private val httpClient: HttpClient
 ) {
-
     suspend fun uploadFile(file: File, token: String, chatId: String){
         val response = httpClient.post("https://api.telegram.org/bot$token/sendDocument") {
             parameter("chat_id", chatId)
@@ -24,6 +23,14 @@ class TelegramApi(
                 )
             )
         }
-        println("CODE = ${response.status.value}")
+        println("sendApk | CODE = ${response.status.value}")
+    }
+
+    suspend fun sendMessage(text: String, token: String, chatId: String){
+        val response = httpClient.post("https://api.telegram.org/bot$token/sendMessage"){
+            parameter("chat_id", chatId)
+            parameter("text", text)
+        }
+        println("sendMessage | CODE = ${response.status.value}")
     }
 }
