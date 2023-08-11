@@ -6,13 +6,9 @@ import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.TaskAction
-import java.io.File
-import kotlin.math.roundToInt
 
 abstract class UploadTask: DefaultTask() {
 
@@ -25,8 +21,8 @@ abstract class UploadTask: DefaultTask() {
     @TaskAction
     fun upload(){
         val api = TelegramApi(HttpClient(OkHttp))
-        val token = Confidential.token
-        val chatId = Confidential.chatId
+        val token = Confidential.telegramToken
+        val chatId = Confidential.telegramChatId
 
         // Execute a thread
         runBlocking {

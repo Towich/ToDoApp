@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.todoapp.R
 import com.example.todoapp.ui.Activity.MainActivity
@@ -42,5 +43,8 @@ class MyReceiver : BroadcastReceiver() {
 
         // Notify the created Notification
         mNotificationManager.notify(p1!!.getIntExtra("id", 0), mBuilder.build())
+
+        // Log
+        Log.i("MyReceiver", "Signal received!")
     }
 }

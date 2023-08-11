@@ -22,8 +22,8 @@ abstract class ValidateApkSizeTask : DefaultTask() {
     @TaskAction
     fun upload() {
         val api = TelegramApi(HttpClient(OkHttp))
-        val token = Confidential.token
-        val chatId = Confidential.chatId
+        val token = Confidential.telegramToken
+        val chatId = Confidential.telegramChatId
 
         val extension = project.extensions.getByType(UploadPluginExtension::class.java)
             ?: throw NullPointerException("UploadPluginExtension not found")

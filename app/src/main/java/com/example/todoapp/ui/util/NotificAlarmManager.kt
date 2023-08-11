@@ -8,6 +8,7 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import com.example.todoapp.data.model.TodoItem
 import com.example.todoapp.ui.Service.MyReceiver
+import java.util.*
 
 /**
  * Static class for create and cancel Notification Alarms.
@@ -28,7 +29,7 @@ object NotificAlarmManager {
         intent.putExtra("text", "Дата дедлайна: " + todoItem.deadlineData)
 
         // Alarm Manager
-        val am = ContextCompat.getSystemService(context, AlarmManager::class.java) as AlarmManager
+        val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         // Pending Intent
         val pendingIntent = PendingIntent.getBroadcast(
@@ -36,7 +37,10 @@ object NotificAlarmManager {
         )
 
         // Set alarm for specific time
-        am.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+        am.setExact(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+
+        // Log
+        Log.i("NotificAlarmManager", "New timer: " + Date(triggerAtMillis).toString())
     }
 
     // Cancel Notification alarm
@@ -46,10 +50,7 @@ object NotificAlarmManager {
         intent.action = todoItem_id.toString()
 
         // Alarm Manager
-        val am = ContextCompat.getSystemService(
-            context,
-            AlarmManager::class.java
-        ) as AlarmManager
+        val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         // Pending Intent
         val pendingIntent = PendingIntent.getBroadcast(
@@ -59,6 +60,9 @@ object NotificAlarmManager {
         // Cancel founded Pending Intent
         pendingIntent.cancel()
         am.cancel(pendingIntent)
-        Log.i("PENDING_INTENT", pendingIntent.toString())
+        Log.i("NotificAlarmManager", pendingIntent.toString())
+
+        // Log
+        Log.i("NotificAlarmManager", "Timer cancelled for task #$todoItem_id!")
     }
 }
