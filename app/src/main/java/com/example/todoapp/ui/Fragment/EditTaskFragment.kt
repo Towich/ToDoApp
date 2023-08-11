@@ -4,6 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.compose.animation.Animatable
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.repeatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
@@ -106,12 +113,17 @@ class EditTaskFragment : Fragment() {
         var showBottomSheet by remember { mutableStateOf(false) }
         var currentImportance by remember { mutableStateOf("Нет") }
 
+        var textFieldShowHint by remember { mutableStateOf(true) }
+        var textFieldShowError by remember { mutableStateOf(false) }
+
         if (isCurrEditing)
             currentImportance = currModel.importance
 
         Scaffold(
             topBar = {
-                EditTaskTopBar()
+                EditTaskTopBar {
+                    textFieldShowError = true
+                }
             },
             content = {
                 Column(
@@ -123,7 +135,16 @@ class EditTaskFragment : Fragment() {
                 ) {
 
                     // Input TextField
-                    MTextField()
+                    MTextField(
+                        showHint = textFieldShowHint,
+                        showError = textFieldShowError,
+                        onClickedHideHint = {
+                            textFieldShowHint = false
+                        },
+                        onClickedHideError = {
+                            textFieldShowError = false
+                        }
+                    )
 
                     // Importance Button
                     ImportanceTextButton(
@@ -402,7 +423,9 @@ class EditTaskFragment : Fragment() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun EditTaskTopBar() { // Top app bar
+    fun EditTaskTopBar(
+        onClickSaveEmptyField: () -> Unit
+    ) { // Top app bar
         TopAppBar(
             title = {},
             colors = TopAppBarDefaults.topAppBarColors(
@@ -430,6 +453,18 @@ class EditTaskFragment : Fragment() {
                 // Save button
                 TextButton(
                     onClick = {
+                        if (currModel.textCase.isEmpty()) {
+                            onClickSaveEmptyField()
+
+                            Toast.makeText(
+                                requireContext(),
+                                "Поле задачи пустое!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                            return@TextButton
+                        }
+
                         // If currently editing an existing task
                         if (isCurrEditing) {
 
@@ -481,18 +516,25 @@ class EditTaskFragment : Fragment() {
     }
 
     @Composable
-    fun MTextField() {
-        var value by remember {
-            mutableStateOf("")
-        }
+    fun MTextField(
+        showHint: Boolean,
+        showError: Boolean,
+        onClickedHideHint: () -> Unit,
+        onClickedHideError: () -> Unit
+    ) {
+        var value by remember { mutableStateOf("") }
 
-        if (isCurrEditing)
+        if (isCurrEditing) {
             value = currModel.textCase
+            onClickedHideHint()
+        }
 
         // Text Field
         BasicTextField(
             value = value,
             onValueChange = { newText ->
+                onClickedHideHint()
+                onClickedHideError()
                 value = newText
                 currModel.textCase = newText
             },
@@ -519,8 +561,25 @@ class EditTaskFragment : Fragment() {
                                 .padding(all = 16.dp)
                         ) {
                             innerTextField()
+                            if (showHint || showError) {
+
+
+                                val initialColor = MaterialTheme.colorScheme.tertiary
+                                val errorTextColor = remember { Animatable(initialColor) }
+                                if(showError) {
+                                    LaunchedEffect(Unit){
+                                        errorTextColor.animateTo(Color.Red, animationSpec = tween(200))
+                                        errorTextColor.animateTo(initialColor, animationSpec = tween(3000))
+                                    }
+                                }
+                                Text(
+                                    text = "Введите задачу..",
+                                    color = if (showError) errorTextColor.value else MaterialTheme.colorScheme.tertiary
+                                )
+                            }
                         }
-                    })
+                    }
+                )
             }
         )
     }
