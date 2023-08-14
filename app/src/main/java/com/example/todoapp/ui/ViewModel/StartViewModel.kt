@@ -1,44 +1,23 @@
 package com.example.todoapp.ui.ViewModel
 
 import android.content.Context
-import android.content.Intent
-import android.os.Handler
-import android.os.Looper
 import android.view.View
-import android.widget.Toast
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.todoapp.data.Repository.StartRepository
 import com.example.todoapp.data.model.TodoItem
-import com.example.todoapp.data.network.RequestCallback
 import com.example.todoapp.ui.Adapter.CustomRecyclerAdapter
-import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class StartViewModel @Inject constructor(
-    var repository: StartRepository,
-    var applicationContext: Context
+    var repository: StartRepository
 ) : ViewModel() {
 
     var completedTasks: MutableLiveData<Int> = repository.completedTasks
     var showingUncompletedTasks: Boolean = false
 
-    // Tasks
-
-    // Add task in Room
-    fun addTask(todoItem: TodoItem){
-        repository.addTask(todoItem)
-    }
-
-    // Add task in Room with creating Notification Alarm
-    fun addTaskWithAlarm(
-        context: Context,
-        todoItem: TodoItem,
-        triggerAtMillis: Long
-    ){
-        repository.addTaskWithAlarm(context, todoItem, triggerAtMillis)
-    }
 
     // Get all tasks from Room
     // and setup into RecyclerView's Adapter
@@ -51,7 +30,7 @@ class StartViewModel @Inject constructor(
 
     // Get all uncompleted tasks from Room
     // and setup into RecyclerView's Adapter
-    fun setupUncompletedTasks(){
+    fun setupUncompletedTasks() {
         viewModelScope.launch {
             val tasksList = repository.getAllUncompletedTasks()
             repository.setAllTasks(tasksList)
@@ -59,7 +38,7 @@ class StartViewModel @Inject constructor(
     }
 
     // Get count of completed tasks
-    fun getQuantityOfCompletedTasks(){
+    fun getQuantityOfCompletedTasks() {
         viewModelScope.launch {
             val tasksList = repository.getAllCompletedTasks()
             completedTasks.value = tasksList.size
@@ -67,78 +46,82 @@ class StartViewModel @Inject constructor(
     }
 
     // Remove task from Room
-    fun removeTask(todoItem: TodoItem){
+    fun removeTask(todoItem: TodoItem) {
         viewModelScope.launch {
             repository.removeTask(todoItem)
         }
     }
 
     // Update task in Room
-    fun updateTask(todoItem: TodoItem){
+    fun updateTask(todoItem: TodoItem) {
         viewModelScope.launch {
             repository.updateTask(todoItem)
         }
     }
 
     // Update task in Adapter
-    fun updateTaskInAdapter(todoItem: TodoItem){
+    fun updateTaskInAdapter(todoItem: TodoItem) {
         repository.updateTaskInAdapter(todoItem)
     }
 
     // Set current model for editing in EditWorkFragment
-    fun setCurrModel(newModel: TodoItem){
+    fun setCurrModel(newModel: TodoItem) {
         repository.setCurrModel(newModel)
     }
 
     // Set current editing flag for editing in EditWorkFragment
-    fun setCurrEditing(newState: Boolean){
+    fun setCurrEditing(newState: Boolean) {
         repository.setCurrEditing(newState)
     }
+
     fun getAdapter(): CustomRecyclerAdapter = repository.getAdapter()
 
     // Increase/decrease counter of completed tasks
-    fun increaseCompletedTasks(delta: Int){
+    fun increaseCompletedTasks(delta: Int) {
         completedTasks.value = completedTasks.value?.plus(delta)
     }
 
     // Test MockWebServer
-    fun testMockWebServer(){
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.testMockWebServer(object: RequestCallback {
-                override fun onSuccess(response: String) {
-                    Handler(Looper.getMainLooper()).post {
-                        Toast.makeText(applicationContext, "SUCCESS", Toast.LENGTH_SHORT).show()
-                    }
-                }
-
-                override fun onFailure(error: String) {
-                    Handler(Looper.getMainLooper()).post {
-                        Toast.makeText(applicationContext, "ERROR", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            })
-        }
-    }
-
-    // Cancel deadline notification
-    fun cancelNotificationAlarm(context: Context, todoItem_id: Int){
-        repository.cancelNotificationAlarm(context, todoItem_id)
-    }
+//    fun testMockWebServer(){
+//        viewModelScope.launch(Dispatchers.IO) {
+//            repository.testMockWebServer(object: RequestCallback {
+//                override fun onSuccess(response: String) {
+//                    Handler(Looper.getMainLooper()).post {
+//                        Toast.makeText(applicationContext, "SUCCESS", Toast.LENGTH_SHORT).show()
+//                    }
+//                }
+//
+//                override fun onFailure(error: String) {
+//                    Handler(Looper.getMainLooper()).post {
+//                        Toast.makeText(applicationContext, "ERROR", Toast.LENGTH_SHORT).show()
+//                    }
+//                }
+//            })
+//        }
+//    }
 
     fun showSnackbarCancelRemove(
         context: Context,
         mView: View,
         deleteItem: TodoItem,
         onClick: () -> Unit
-    ){
+    ) {
         repository.showSnackbarCancelRemove(context, mView, deleteItem, onClick)
     }
 
-    fun dismissShowingSnackbar(){
+    fun dismissShowingSnackbar() {
         repository.dismissShowingSnackbar()
     }
 
-     fun animateNewHeight(view: View, newHeight: Int) {
-         repository.animateNewHeight(view, newHeight)
-     }
+    fun animateNewHeight(view: View, newHeight: Int) {
+        repository.animateNewHeight(view, newHeight)
+    }
+
+    fun animateMarginEyeButton(eyeButton: View, newValue: Int, duration: Long) {
+        repository.animateMarginEyeButton(eyeButton, newValue, duration)
+    }
+
+    fun animateAlpha(view: View, newAplha: Float, duration: Long) {
+        repository.animateAlpha(view, newAplha, duration)
+    }
 }

@@ -39,6 +39,9 @@ class StartFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    var toolBarExpanded: Boolean = true
+    var toolBarCollapsed: Boolean = true
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -125,7 +128,7 @@ class StartFragment : Fragment() {
             binding.imageButtonShowCompletedTasks.setImageResource(R.drawable.visibility_off)
         }
 
-        hideCompletedTasksOnToolBar()
+        appBarOnOffsetChanged()
         swipeToGesture(recyclerView)
     }
 
@@ -187,17 +190,82 @@ class StartFragment : Fragment() {
         touchHelper.attachToRecyclerView(itemRecyclerView)
     }
 
-    // Hide TextView "Completed Tasks"
-    // then toolbar is collapsed
-    private fun hideCompletedTasksOnToolBar() {
+    // Animate TextView "Completed Tasks" and Button "Eye"
+    // when toolbar is extended/collapsed
+    private fun appBarOnOffsetChanged() {
+        val marginEndAnimationDuration = 500L
+        val alphaAnimationDuration = 250L
+        val expandedEndMargin = 70
+        val collapsedEndMargin = 20
+
         binding.appBarLayout.addOnOffsetChangedListener { _, verticalOffset ->
             run {
-                if (verticalOffset == 0) {
-                    // If expanded, then do this
-                    binding.textViewCompletedTasks.visibility = View.VISIBLE
+                // Animate TextView and EyeButton when $verticalOffset is close to be extended
+                if (verticalOffset > -5) {
+                    // If expanded
+                    if (toolBarExpanded) {
+
+                        // Animate alpha of TextView "Completed tasks"
+                        viewModel.animateAlpha(
+                            binding.textViewCompletedTasks,
+                            1f,
+                            alphaAnimationDuration
+                        )
+
+                        // Animate marginEnd of Button "Eye"
+                        viewModel.animateMarginEyeButton(
+                            binding.imageButtonShowCompletedTasks,
+                            expandedEndMargin,
+                            marginEndAnimationDuration
+                        )
+                        toolBarExpanded = false
+                    }
                 } else {
-                    // If collapsed || somewhere in between
-                    binding.textViewCompletedTasks.visibility = View.GONE
+                    // If somewhere in between
+                    if (!toolBarExpanded && verticalOffset < -5) {
+
+                        // Animate alpha of TextView "Completed tasks"
+                        viewModel.animateAlpha(
+                            binding.textViewCompletedTasks,
+                            0f,
+                            alphaAnimationDuration
+                        )
+
+                        // Animate marginEnd of Button "Eye"
+                        viewModel.animateMarginEyeButton(
+                            binding.imageButtonShowCompletedTasks,
+                            collapsedEndMargin,
+                            marginEndAnimationDuration
+                        )
+                        toolBarExpanded = true
+                    }
+                }
+
+                // Like above, animate when $verticalOffset is close to be collapsed
+                if (verticalOffset < -270) {
+                    // If collapsed
+                    if (toolBarCollapsed) {
+
+                        // Animate marginEnd of Button "Eye"
+                        viewModel.animateMarginEyeButton(
+                            binding.imageButtonShowCompletedTasks,
+                            collapsedEndMargin,
+                            marginEndAnimationDuration
+                        )
+                        toolBarCollapsed = false
+                    }
+                } else {
+                    // If somewhere in between
+                    if (!toolBarCollapsed && verticalOffset > -270) {
+
+                        // Animate marginEnd of Button "Eye"
+                        viewModel.animateMarginEyeButton(
+                            binding.imageButtonShowCompletedTasks,
+                            expandedEndMargin,
+                            marginEndAnimationDuration
+                        )
+                        toolBarCollapsed = true
+                    }
                 }
             }
         }

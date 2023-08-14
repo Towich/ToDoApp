@@ -1,16 +1,9 @@
 package com.example.todoapp.data.Repository
 
-import android.animation.ValueAnimator
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.View
-import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DiffUtil
 import com.example.todoapp.data.database.TaskDao
@@ -22,8 +15,8 @@ import com.example.todoapp.data.network.FileReader
 import com.example.todoapp.data.network.RequestCallback
 import com.example.todoapp.ui.Adapter.CustomRecyclerAdapter
 import com.example.todoapp.ui.Adapter.UsersDiffCallback
-import com.example.todoapp.ui.Service.MyReceiver
 import com.example.todoapp.ui.util.NotificAlarmManager
+import com.example.todoapp.ui.util.ViewAnimations
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
@@ -352,14 +345,14 @@ class StartRepository @Inject constructor(
     }
 
     fun animateNewHeight(view: View, newHeight: Int) {
-        val valueAnimator = ValueAnimator.ofInt(view.measuredHeight, newHeight)
-        valueAnimator.duration = 500L
-        valueAnimator.addUpdateListener {
-            val animatedValue = valueAnimator.animatedValue as Int
-            val layoutParams = view.layoutParams
-            layoutParams.height = animatedValue
-            view.layoutParams = layoutParams
-        }
-        valueAnimator.start()
+        ViewAnimations.animateNewHeight(view, newHeight)
+    }
+
+    fun animateMarginEyeButton(eyeButton: View, newValue: Int, duration: Long) {
+        ViewAnimations.animateMarginEnd(eyeButton, newValue, duration)
+    }
+
+    fun animateAlpha(view: View, newAplha: Float, duration: Long){
+        ViewAnimations.animateAlpha(view, newAplha, duration)
     }
 }
